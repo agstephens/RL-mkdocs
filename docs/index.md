@@ -19,13 +19,18 @@ Our module adopts a pragmatic approach, aiming to provide participants with a so
 
 
 **Unit 1 Learning outcomes**
-1. understand the armed bandit problem and its simplification of isolating the action space
+1- understand the armed bandit problem and its simplification of isolating the action space
 1. understand the value function and the action-value function and their essential roles in RL
 1. understand the difference between associative and non-associative problems
 1. understand the underlying theory of RL including MDP and Bellman equation
 1. understand the difference between prediction and control in RL settings
 
 **Unit 2 Learning outcomes**
+
+1. Item A  
+1. Item B  
+1. Item C  
+
 1. understand how to predict the value function for a policy in tabular settings
 1. understand how to control an agent by inferring its policy from an action-value function
 1. understand the idea of generalised policy iteration (GPI) that is utilised by many RL methods
