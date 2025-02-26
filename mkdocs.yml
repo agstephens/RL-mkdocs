@@ -1,0 +1,97 @@
+site_name: Reinforcement Learning for Autonomous Agents
+site_author: Dr Abdulrahman Altahhan
+copyright: Copyright Abdulrahman Altahhan
+nav:
+  - Home: index.md
+  - Unit 1: 
+    - 1. Tabular Methods: unit1/lesson1/lesson1.md
+    - 2. K-Arm Bandit: unit1/lesson2/lesson2.md
+    - 3. MDP: unit1/lesson3/lesson3.md
+    - 4. ROS: unit1/lesson4/lesson4.md
+
+  - Unit 2: 
+    - 5. Dynamic Programming: unit2/lesson5/lesson5.md
+    - 6. Monte Carlo: unit2/lesson6/lesson6.md
+    - 7. Mobile Robots: unit2/lesson7/lesson7.md
+
+  - Unit 3:
+    - 8. Temporal Difference: unit3/lesson8/lesson8.md
+    - 9. n-Step Methods: unit3/lesson9/lesson9.md
+    - 10. Planning in RL(optional): unit3/lesson10/lesson10.md
+    - 11. Localisation and SLAM: unit3/lesson11/lesson11.md
+
+  - Unit 4: 
+    - 12. Function Approximation Methods: unit4/lesson12/lesson12.md
+    - 13. Linear Approximation for Prediction: unit4/lesson13/lesson13.md
+    - 14. Linear Approximation for Control: unit4/lesson14/lesson14.md
+    
+
+  - Unit 5: 
+    - 15. Linear Approximation with Eligibility Traces(prediction and control): unit5/lesson15/lesson15.md
+    - 16. Nonlinear Approximation for Control: unit5/lesson16/lesson16.md
+    - 17. Application on Robot Navigation: unit5/lesson17/lesson17.md
+    
+  - Unit 6: 
+    - 18. Application on Games(optional): unit6/lesson18/lesson18.md
+
+  
+use_directory_urls: false
+
+# theme: readthedocs
+# theme: material
+
+# markdown_extensions:
+#   - pymdownx.arithmatex:
+#       generic: true
+#       # tags: 'ams'
+
+
+# extra_javascript:
+#   - https://polyfill.io/v3/polyfill.min.js?features=es6
+#   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+
+
+theme:
+  name: material
+  custom_dir: overrides
+  features:
+    - navigation.tabs
+    - navigation.sections
+  font:
+    text: Inter
+  favicon: img/favicon.jpg
+
+plugins:
+  - search
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.tabbed
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.snippets
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.smartsymbols
+  - pymdownx.betterem:
+      smart_enable: all
+
+
+extra_javascript:
+  - javascript/tablecontentsoverride.js
+  - javascript/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra_css:
+  - css/extra.css
