@@ -19,6 +19,7 @@ Our module adopts a pragmatic approach, aiming to provide participants with a so
 
 
 **Unit 1 Learning outcomes**
+
 1- understand the armed bandit problem and its simplification of isolating the action space
 1. understand the value function and the action-value function and their essential roles in RL
 1. understand the difference between associative and non-associative problems
@@ -26,10 +27,6 @@ Our module adopts a pragmatic approach, aiming to provide participants with a so
 1. understand the difference between prediction and control in RL settings
 
 **Unit 2 Learning outcomes**
-
-1. Item A  
-1. Item B  
-1. Item C  
 
 1. understand how to predict the value function for a policy in tabular settings
 1. understand how to control an agent by inferring its policy from an action-value function
@@ -39,6 +36,7 @@ Our module adopts a pragmatic approach, aiming to provide participants with a so
 1. understand how REINFORCE obtains an unbiased but high variance estimation via interaction with using the environment
 
 **Unit 3 Learning outcomes**
+
 1. appreciate the importance of bootstrapping and its essential role in RL
 1. understand n-steps methods and the trade-offs that n represents
 1. understand the difference between n-steps-backup action-value based control methods and direct policy estimation control methods
@@ -48,24 +46,27 @@ Our module adopts a pragmatic approach, aiming to provide participants with a so
 1. understand planning methods and how to build a model along the way by learning
 
 **Unit 4 Learning outcomes**
+
 1. apply RL to control an agent in a more complex environment representation
 1. understand on-policy and off-policy algorithms trade-offs 
 1. be familiar with the convergence of RL algorithms in tabular and approximation settings and their practical limitations
 
 **Unit 5 Learning outcomes**
+
 1. understand how to predict the value function for a policy using function approximation
 1. understand eligibility traces methods and the trade-offs that their depth represents
 1. understand how to control an agent by inferring its policy from an action-value function with function approximation
 1. apply RL to control a robot
 
 **Unit 6 Learning outcomes**
+
 1. apply RL to control an agent in Games
 
 
 ## RL in context: advantages and challenges
-In our RL coverage you will notice that we do not do classical robotics and we believe it is not the way to go except possibly for industrial robots. So, we do not need motion planning or accurate trajectory calculations/kinematics to allow the robot to execute a task, we simply let it learn by itself how to solve the task and this is what reinforcement learning is about. In our coverage we also do not supervise or directly teach the robot, this type of interference is called imitation. 
+In our RL coverage, you will notice that we do not do classical robotics and we believe it is not the way to go except possibly for industrial robots. So, we do not need motion planning or accurate trajectory calculations/kinematics to allow the robot to execute a task, we simply let it learn by itself how to solve the task and this is what reinforcement learning is about. In our coverage we also do not supervise or directly teach the robot, this type of interference is called imitation. 
 
-This is all great but what about challenges. Obviously, we still have several challenges to this approach. One is the number of experiments required to learn the task which can be numerous, which expose the physical agents (real robots) to the risk of wear and tear due to repetition and can be very lengthy and tedious on the human that is supervising the task. This can be partially overcome by starting in simulation and then move to real robot called a technique called [sim-to-real](https://ai.googleblog.com/2021/06/toward-generalized-sim-to-real-transfer.html) where we can employ GANs(generative adversarial neural networks).  The other challenge is the time required for training regardless whether it is in simulation or in real scenarios. 
+This is all great but what about challenges? Obviously, we still have several challenges to this approach. One is the number of experiments required to learn the task which can be numerous, which exposes the physical agents (real robots) to the risk of wear and tear due to repetition and can be very lengthy and tedious for the human that is supervising the task. This can be partially overcome by starting in simulation and then moving to a real robot with a technique called [sim-to-real](https://ai.googleblog.com/2021/06/toward-generalized-sim-to-real-transfer.html) where we can employ GANs(generative adversarial neural networks).  The other challenge is the time required for training regardless whether it is in simulation or in real scenarios. 
 
 
 The origin of these problems is actually the exploitation/exploration needed by RL algorithms which is in the heart of what we will be doing in all of our RL coverage. Reducing the amount of training required is important and remains an active area for research. One approach is via experience replay and the other is via eligibility traces as we shall see later.
@@ -226,32 +227,32 @@ For better readability and experience, please use Jupyter Lab or Vcode(if you ar
 - [Lesson and Worksheet 21: Reinforcement Learning Application on Games Agents](unit6/lesson21/lesson21.md) -->
 
  - Unit 1: 
-    - 1. [Tabular Methods](unit1/lesson1/lesson1.md)
-    - 2. [K-Arm Bandit](unit1/lesson2/lesson2.md)
-    - 3. [MDP](unit1/lesson3/lesson3.md)
-    - 4. [ROS](unit1/lesson4/lesson4.md)
+   1. [Tabular Methods](unit1/lesson1/lesson1.md)
+   2. [K-Arm Bandit](unit1/lesson2/lesson2.md)
+   3. [MDP](unit1/lesson3/lesson3.md)
+   4. [ROS](unit1/lesson4/lesson4.md)
 
   - Unit 2: 
-    - 5. [Dynamic Programming](unit2/lesson5/lesson5.md)
-    - 6. [Monte Carlo](unit2/lesson6/lesson6.md)
-    - 7. [Mobile Robots](unit2/lesson7/lesson7.md)
+    5. [Dynamic Programming](unit2/lesson5/lesson5.md)
+    6. [Monte Carlo](unit2/lesson6/lesson6.md)
+    7. [Mobile Robots](unit2/lesson7/lesson7.md)
 
   - Unit 3:
-    - 8. [Temporal Difference](unit3/lesson8/lesson8.md)
-    - 9. [n-Step Methods](unit3/lesson9/lesson9.md)
-    - 10. [Planning in RL(optional)](unit3/lesson10/lesson10.md)
-    - 11. [Localisation and SLAM](unit3/lesson11/lesson11.md)
+    8. [Temporal Difference](unit3/lesson8/lesson8.md)
+    9. [n-Step Methods](unit3/lesson9/lesson9.md)
+    10. [Planning in RL(optional)](unit3/lesson10/lesson10.md)
+    11. [Localisation and SLAM](unit3/lesson11/lesson11.md)
 
   - Unit 4: 
-    - 12. [Function Approximation Methods](unit4/lesson12/lesson12.md)
-    - 13. [Linear Approximation for Prediction](unit4/lesson13/lesson13.md)
-    - 14. [Linear Approximation for Control](unit4/lesson14/lesson14.md)
+    12. [Function Approximation Methods](unit4/lesson12/lesson12.md)
+    13. [Linear Approximation for Prediction](unit4/lesson13/lesson13.md)
+    14. [Linear Approximation for Control](unit4/lesson14/lesson14.md)
     
 
   - Unit 5: 
-    - 15. [Linear Approximation with Eligibility Traces(prediction and control)](unit5/lesson15/lesson15.md)
-    - 16. [Nonlinear Approximation for Control](unit5/lesson16/lesson16.md)
-    - 17. [Application on Robot Navigation](unit5/lesson17/lesson17.md)
+    15. [Linear Approximation with Eligibility Traces(prediction and control)](unit5/lesson15/lesson15.md)
+    16. [Nonlinear Approximation for Control](unit5/lesson16/lesson16.md)
+    17. [Application on Robot Navigation](unit5/lesson17/lesson17.md)
     
   - Unit 6: 
-    - 18. [Application on Games(optional)](unit6/lesson18/lesson18.md)
+    18. [Application on Games(optional)](unit6/lesson18/lesson18.md)
