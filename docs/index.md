@@ -137,6 +137,10 @@ If the VM becomes corrupted for some reason, then you can reimage it by going to
 
 We have provided you with two [RL libraries](/RLlibrary.zip){:download="RLlibrary.zip"} designed for this module. One has bespoke environments and one that has base RL classes that makes working with algorithms very easy and as close as it can be to just provide an update rule.
 
+You can launch code directly here
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new/?repo=<your-repo>&ref=main)
+
+
 ## Installing other libraries that will be needed later
 <!-- general -->
 ```
