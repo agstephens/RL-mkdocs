@@ -146,6 +146,8 @@ We have provided you with two [RL libraries](/RLlibrary.zip){:download="RLlibrar
 You can launch code directly here
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new/?repo=<your-repo>&ref=main)
 
+https://github.com/codespaces/new?repository=<your-repo>&ref=main&quickstart=1&file=<path-to-notebook>
+
 
 ## Installing other libraries that will be needed later
 <!-- general -->
@@ -184,47 +186,6 @@ You can launch code directly here
 
 ## Better Readability
 For better readability and experience, please use Jupyter Lab or Vcode(if you are using Azure VM) to navigate between the different notebooks easily. If you want to use Jupyter Notebooks and not Jupyter Lab, we recommend that you also increase the cells' width for a better reading experience. We provided a function that increase your notebook width which is envoked automatically when you import an environment (grid particularly) as you shall see later. You may want to utilise also the table of contents button in Jupetr Lab.
-
-<!-- # Table of Contents
-     
-## Unit 1: K-Armed Bandit and Markov Decision Processes(MDP)
-- [Lesson 1: Introduction to Tabular Methods](unit1/lesson1/lesson1.md)
-- [Lesson and Worksheet 2: K-Armed Bandit and Learning Q](unit1/lesson2/lesson2.md)
-- [Lesson and Worksheet 3: Markov Decision Processes and Grid World](unit1/lesson3/lesson3.md)
-- [Lesson and worksheet 4: Robotics Operating System](unit1/lesson4/lesson4.md)
-
-## Unit 2: Dynamic Programming and Monte Carlo Algorithms
-- [Lesson and Worksheet 5: Dynamic Programming](unit2/lesson5/lesson5.md)
-- [Lesson and Worksheet 6: Monte Carlo Methods](unit2/lesson6/lesson6.md)
-- [Lesson and Worksheet 7: Introduction To Mobile Robots](unit2/lesson7/lesson7.md)
-- [Lesson and Worksheet 8: ROS-Hello World](unit2/lesson8/lesson8.md)
-
-    
-## Unit 3: Temporal Difference: Prediction, Control and Planning(Tabular)
-- [Lesson and Worksheet 9: Temporal Learning Methods](unit3/lesson9/lesson9.md)
-- [Lesson and Worksheet 10: n-step Methods](unit3/lesson10/lesson10.md)
-- [Lesson and Worksheet 11: Planning Methods-Optional](unit3/lesson11/lesson11.md)
-- [Lesson and Worksheet 12: ROS-Publish and Subscribe](unit3/lesson12/lesson12.md)
-<!-- - [Lesson and Worksheet 18: ROS-turtlebot3 Control using Keyboard](ROSWorksheet6.ipynb) -->
-
-<!-- ## Unit 4: Temporal Difference: Prediction, Control and Eligibility (Linear Function Approximation)
-- [Lesson 13: Introduction to Function Approximation Methods](unit4/lesson13/lesson13.md)
-- [Lesson and Worksheet 14: Linear Approximation for Prediction](unit4/lesson14/lesson14.md)
-- [Lesson and Worksheet 15: Linear Approximation for Control](unit4/lesson15/lesson15.md)
-- [Lesson and Worksheet 16: Eligibility Traces for Prediction and Control](unit4/lesson16/lesson16.md) -->
-<!-- - [Lesson and Worksheet 17: ROS-Navigation](unit4/lesson17/lesson17.md) -->
-<!-- [ROS Worksheet 3: Classical Robotics SLAM](ROSWorksheet3.ipynb) -->
-
-
-
-<!-- ## Unit 5: Temporal Difference: Prediction, Control and Eligibility (Non-Linear Function Approximation)
-- [Lesson and Worksheet 17: NonLinear Approximation for Control](unit5/lesson17/lesson17.md)
-- [Lesson and Worksheet 18: Reinforcement Learning Application on Robot Navigation](unit5/lesson18/lesson18.md)
-- [Lesson and Worksheet 19: Classical Robotics Navigation](unit5/lesson19/lesson19.md)
-- [Lesson and Worksheet 20: ROS-RL-Navigation](unit5/lesson20/lesson20.md)
-
-## Unit 6: RL Applied on Other Domains- Optional
-- [Lesson and Worksheet 21: Reinforcement Learning Application on Games Agents](unit6/lesson21/lesson21.md) -->
 
  - Unit 1: 
    1. [Tabular Methods](unit1/lesson1/lesson1.md)
