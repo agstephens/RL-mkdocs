@@ -20,7 +20,7 @@ Our module adopts a pragmatic approach, aiming to provide participants with a so
 
 **Unit 1 Learning outcomes**
 
-1- understand the armed bandit problem and its simplification of isolating the action space
+1. understand the armed bandit problem and its simplification of isolating the action space
 1. understand the value function and the action-value function and their essential roles in RL
 1. understand the difference between associative and non-associative problems
 1. understand the underlying theory of RL including MDP and Bellman equation
