@@ -6,7 +6,7 @@
             "version": "3.9"
         }
     },
-    "postCreateCommand": "pip install jupyterlab, cp -r docs/worksheets/ /home/codespace/my_notebooks",
+    "postCreateCommand": "pip install jupyterlab && mkdir -p /workspaces/worksheets && cp -r docs/worksheets/ /workspaces/worksheets/",
     "customizations": {
         "vscode": {
             "extensions": ["ms-toolsai.jupyter"]
