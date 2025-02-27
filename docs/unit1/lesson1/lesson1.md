@@ -1,5 +1,17 @@
 # Lesson 1: Introduction to Tabular Methods in Reinforcement Learning
 
+**Unit 1 Learning outcomes**
+
+By the end of this unit, you will be able to:  
+
+1. **Explain** the armed bandit problem and how isolating the action space simplifies decision-making.  
+2. **Describe** the value function and the action-value function, highlighting their essential roles in reinforcement learning (RL).  
+3. **Differentiate** between associative and non-associative problems in RL.  
+4. **Analyze** the theoretical foundations of RL, including Markov Decision Processes (MDPs) and the Bellman equation.  
+5. **Compare** prediction and control in RL settings, outlining their respective challenges and solutions.  
+
+---
+
 In this unit, we cover the main framework of reinforcement learning, namely Markov Decision Processes(MDPs). RL has gained a lot of attention in recent years due to its unmatched ability to tackle difficult control problems with a minimal assumption about the setting and the environment that an agent works in. Controlling an agent (simulated robot) is not trivial and can often require a specific setup and strong assumptions about its environment that make the corresponding solution sometimes either difficult to attain or impractical in real scenarios. In RL, we try to minimise these assumptions and require that only the environment adheres to the Markov property. In simple terms, the Markov property assumes that inferring what to do (taking action) in a specific state can be fully specified by looking at this state and does not depend on other states.
 
 In RL, we deal with states, actions and rewards. State space is the space the agent operates in, whether physical or virtual. The state can represent something specific in the environment, an agent configuration or both. The actions are the set of decisions available for the agent to take. An RL agent's main aim is to attain, usually via learning, a cohesive policy that allows it to achieve a specific goal. This policy $π$ can take a simple form $π(s)=a$ or symbolically $s → a$, which means if the agent is in state $s$, then take action $a$. This type of policy is deterministic because the agent will definitely take the action $a$ if it is in state $s$. Another type of policy that we deal with is stochastic policy. A stochastic policy takes the form of $π(a|s)$, which represents the probability of taking action $a$ given that the agent is in state $s$. For such a policy, the agent draws from the set of available actions according to the conditional probability, which we call its policy.

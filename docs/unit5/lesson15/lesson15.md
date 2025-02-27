@@ -1,7 +1,13 @@
-Author: Abdulrahman Altahhan, 2025
+**Unit 5: Learning Outcomes**  
+By the end of this unit, you will be able to:  
 
-The notebook uses a library of functionality in RL that aims for simplicity and general insight into how algorithms work, these libraries are written from scratch using standard Python libraries (numpy, matplotlib etc.).
-Please note that you will need permission from the author to use the code for research, commercially or otherwise.
+1. **Predict** the value function for a policy using function approximation techniques.  
+2. **Explain** eligibility traces and the trade-offs associated with their depth.  
+3. **Implement** control methods that infer an agent’s policy from an action-value function with function approximation.  
+4. **Apply** RL techniques to control a robotic system.  
+
+---
+In this unit we continue our coverage of function approximation to try to achieve muti-step update effect by performing one update only via the nifty ideas of elegibility traces. We then move into utilising nonlinear function approximation to perfrom prediction and control in RL settings.
 
 # Lesson 14: Eligibility Traces for Approximate Prediction and Control
 

@@ -1,11 +1,13 @@
-Author: Abdulrahman Altahhan, 2024.
 
-The notebook uses a library of functionality in RL that aims for simplicity and general insight into how algorithms work, these libraries are written from scratch using standard Python libraries (numpy, matplotlib etc.).
-Please note that you will need permission from the author to use the code for research, commercially or otherwise.
+<!-- By the end of this unit, you will be able to:
+
+1. **Apply** RL techniques to control an agent in game environments.   -->
+
 
 # Lesson 18: RL Application on Games
 
-**Learning outcomes**
+**Unit 6: Learning Outcomes**  
+
 1. understand how to create a simple wrapper for a Gym environment to take advantage of its provided functionality
 1. understand how to integrate our previous classes with Gym to combine them in a powerful way
 1. appreciate the intricacy of applying RL to different domains such as games and robotics
@@ -13,81 +15,6 @@ Please note that you will need permission from the author to use the code for re
 1. understand how to combine deep reinforcement learning with deep learning to create a powerful framework that allows automatic agent learning by observation or self-play.
 1. understand how a replay buffer helps us to come closer to supervised learning and appreciate the important role it plays in reaching convergence for difficult problems that involve image processing and reinforcement learning
 
-
-## Dependencies
-
-Let us first install the gym environment and other dependencies including tensorflow and keras.
-#gym
-!pip3 install gym
-!pip3 install pygame
-!pip3 install pyglet
-!pip3 install ale-py
-!pip3 install autorom
-!pip3 install 'gym[atari]' gym
-#!pip install --upgrade 'gym[atari]'
-!pip3 install --upgrade gym
-!pip3 install autorom[accept-rom-license]
-!pip3 install pydot
-Let us test if it is working
-
-
-```python
-!pip3 show tensorflow
-```
-
-    /bin/pip3:6: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
-      from pkg_resources import load_entry_point
-    Name: tensorflow
-    Version: 2.13.1
-    Summary: TensorFlow is an open source machine learning framework for everyone.
-    Home-page: https://www.tensorflow.org/
-    Author: Google Inc.
-    Author-email: packages@tensorflow.org
-    License: Apache 2.0
-    Location: /home/rl/.local/lib/python3.8/site-packages
-    Requires: absl-py, astunparse, flatbuffers, gast, google-pasta, grpcio, h5py, keras, libclang, numpy, opt-einsum, packaging, protobuf, setuptools, six, tensorboard, tensorflow-estimator, termcolor, typing-extensions, wrapt, tensorflow-io-gcs-filesystem
-    Required-by: 
-
-
-You should be able to see the location of your tensorflow. If you cannot you might need to do: sudo nano ~/.bashrc and append the tensorflow path as follows (be mindful to the python version, yours might be > 3.6)
-
-export PYTHONPATH=/home/user/.local/lib/python3.6/site-packages:$PYTHONPATH.
-
-We can also check if our GPU is defined as follows.
-
-
-```python
-from tensorflow.python.client import device_lib
-print(device_lib.list_local_devices())
-
-# or
-!python3 -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
-```
-
-    2024-05-06 09:48:12.076221: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
-    2024-05-06 09:48:17.750243: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
-    2024-05-06 09:48:17.768049: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-05-06 09:48:21.351978: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-
-
-    [name: "/device:CPU:0"
-    device_type: "CPU"
-    memory_limit: 268435456
-    locality {
-    }
-    incarnation: 8559295629388873333
-    xla_global_id: -1
-    ]
-    2024-05-06 09:48:26.056521: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
-    2024-05-06 09:48:26.108027: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
-    2024-05-06 09:48:26.108689: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-    To enable the following instructions: AVX2 AVX512F FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-    2024-05-06 09:48:27.028070: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-    []
-
-
-To run this notebook on a remote Azure lab server check this [link](https://docs.microsoft.com/en-us/azure/lab-services/class-type-jupyter-notebook#template-virtual-machine)
 
 **Reading**:
 The accompanying reading of this lesson is **chapter 16** of our text book available online [here](http://incompleteideas.net/book/RLbook2020.pdf). Please note that we explain the ideas of this topic from a practical perspective and not from a theoretical perspective which is already covered in the textbook.
@@ -113,63 +40,16 @@ This is a useful exercise to familiarise ourselves with Gym and verify our findi
 Note that we have already set up our classes in previous lessons to be ready to integrate easily with Gym. We will show this in the following example.
 
 
-```python
-%matplotlib inline
-```
+
+## Useful Resources
+There are plenty of videos and resources which you can search online for.
+- You may want to follow the following [tutorial](https://www.tensorflow.org/agents/tutorials/1_t_DQNnutorial#environment) which shows how to deal with tensorflow on cart pole but the input is not the frames.
+- You may then follow this [tutorial](https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html#hyperparameters-and-utilities) which uses deep learning on the frames of a cart pole problem.
+
+- You may find it useful to watch this [video](https://www.youtube.com/watch?v=a5XbO5Qgy5w) for a Keras tutorial with RL, or this [video](https://www.youtube.com/watch?v=NP8pXZdU-5U) for a pytorch tutorial with RL. 
+- You may want to have a look at some [tutorials](https://neptune.ai/blog/best-reinforcement-learning-tutorials-examples-projects-and-courses).
 
 
-```python
-import time
-import os
-import cv2
-from math import floor
-import numpy as np
-from numpy.random import rand
-from collections import deque
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib.animation as animation
-```
-
-
-```python
-import gym
-from gym.envs.classic_control import MountainCarEnv
-from gym import wrappers
-import pygame
-from ale_py import ALEInterface
-ale = ALEInterface()
-
-from ale_py.roms import Breakout
-# ale.loadROM(Breakout)
-```
-
-    A.L.E: Arcade Learning Environment (version 0.8.1+53f58b7)
-    [Powered by Stella]
-
-
-
-```python
-import tensorflow as tf
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-from sklearn.model_selection import train_test_split
-from tensorflow.keras import layers, losses
-from tensorflow.keras.datasets import fashion_mnist
-from tensorflow.keras.models import Model
-
-from IPython.display import clear_output
-
-from tensorflow.keras.layers import Conv2D, Dense, Flatten, Input
-from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam
-
-```
-
-
-```python
-import nbimporter
-from Lesson14_EligibilityTraces_Prediction_Control import *
-```
 
 We start by showing you how to inherit from gym environment. We will do exactly what we did in the previous lesson regarding training a mountain car. This time we will utilise the openai gym environment rendering and 
 
@@ -666,90 +546,11 @@ print(buffer)
     deque([('2', 1, '3'), ('3', 2, '4'), ('4', 2, '5'), ('5', 1, '4')], maxlen=4)
 
 
-Now in order to sample we can directly sample from the buffer 
-
-
-```python
-batch = random.sample(buffer,3)
-print(batch)
-```
-
-    [('2', 1, '3'), ('5', 1, '4'), ('3', 2, '4')]
-
-
-However, the above is not useful, usually we want to place all the actions and states and next states in their own list to feed them as a batch into a neural network. To put all states and actions together each in its own list we can use zip
-
-
-```python
-for i in zip(*batch): print(i)
-```
-
-    ('2', '5', '3')
-    (1, 1, 2)
-    ('3', '4', '4')
-
-
-We can also convert them into a numpy array directly.
-
-
-```python
-[np.array(i) for i in zip(*batch)]
-```
-
-
-
-
-    [array(['2', '5', '3'], dtype='<U1'),
-     array([1, 1, 2]),
-     array(['3', '4', '4'], dtype='<U1')]
-
-
-
-
-```python
-buffer = deque(maxlen=4)
-buffer.append(('2',1,'3'))
-buffer.append(('3',2,'4'))
-buffer.append(('4',2,'5'))
-buffer.append(('5',1,'4'))
-
-print(buffer)
-samples = [np.array(item) for item in zip(*sample(buffer,3))]
-print(samples)
-```
-
-    deque([('2', 1, '3'), ('3', 2, '4'), ('4', 2, '5'), ('5', 1, '4')], maxlen=4)
-    [array(['5', '2', '3'], dtype='<U1'), array([1, 1, 2]), array(['4', '3', '4'], dtype='<U1')]
-
 
 ## Deep MRP
 In this class we implement the basic functionality for dealing with creating, saving and loading deep learning models. In addition, we make these models the default functions used to obtain the value function via self.V_.
 We also adjust the stope_exp criterion so that the algorithm stops when a specific averaged reward is achieved or when a specific *total* number of steps (self.t_ not self.t) have been elapsed. This means also that we free ourselves from the notion of an episode, so our model can run as many episodes as it takes to achieve this total number of steps. We still can assign episodes=x to store metrics for last y episodes where y<x.
 Note that nF is usually used in the Env(ironment) class but feature extraction is embedded the model itself in deep learning model so it is defined in the Deep_MRP class.
-
-
-```python
-200000%(int(2e6)*.1)==0
-```
-
-
-
-
-    True
-
-
-
-
-```python
-env=GymEnv()
-env.nA
-```
-
-
-
-
-    3
-
 
 
 
@@ -926,10 +727,7 @@ class Deep_MDP(Deep_MRP):
 
 ```
 
-
-
 ## Deep Q-Learning Architecture
-
 
 Note that we need to set ε here otherwise it will be set by default to .1 in the parent class.
 
@@ -1076,13 +874,6 @@ Congratulations on completing this last unit on RL!
 Read the following classic Nips [paper](https://deepmind.com/research/publications/2019/playing-atari-deep-reinforcement-learning) and Nature [paper](https://storage.googleapis.com/deepmind-media/DQN/DQNNaturePaper.pdf) and discuss it in the discussion forum.
 
 ## Extra Resources
-There are plenty of videos and resources which you can search online for.
-- You may want to follow the following [tutorial](https://www.tensorflow.org/agents/tutorials/1_t_DQNnutorial#environment) which shows how to deal with tensorflow on cart pole but the input is not the frames.
-- You may then follow this [tutorial](https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html#hyperparameters-and-utilities) which uses deep learning on the frames of a cart pole problem.
-
-- You may find it useful to watch this [video](https://www.youtube.com/watch?v=a5XbO5Qgy5w) for a Keras tutorial with RL, or this [video](https://www.youtube.com/watch?v=NP8pXZdU-5U) for a pytorch tutorial with RL. 
-- You may want to have a look at some [tutorials](https://neptune.ai/blog/best-reinforcement-learning-tutorials-examples-projects-and-courses).
-
 - You may find see this series of talks about the [future of AI](https://www.bbc.co.uk/sounds/play/m001216j) by Stuart Russell interesting.
 - If you are intersted in self-driving cars, then:
     - See the [ALVIN](https://papers.nips.cc/paper/1988/file/812b4ba287f5ee0bc9d43bbf5bbe87fb-Paper.pdf) paper for an early stage vehicle road control neural network, it is an early precursor of the current road systems that control autonomous vehicle. A lot of the new systems retain some similarities with this systems. 

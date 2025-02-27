@@ -8,6 +8,19 @@ In this and subsequent units, we cover a set of RL algorithms that use bootstrap
 
 The settings are still the same as that of an MDP. However, we assume that the state space is large and may not be practical to represent each state as an entry in a table. The states might also not manifest themselves clearly, and only we can obtain some observations about them. These observations result in a set of numerical, categorical or boolean features which we can then numerically deal with them as we did in earlier modules.
 
+**Unit 3: Learning Outcomes**  
+By the end of this unit, you will be able to:  
+
+1. **Assess** the role of bootstrapping in RL and its impact on learning efficiency.  
+2. **Explain** n-step methods and the trade-offs associated with different values of n.  
+3. **Compare** n-step backup action-value-based control methods with direct policy estimation methods.  
+4. **Evaluate** how Temporal Difference (TD) methods obtain biased but low-variance estimates through environment interaction.  
+5. **Analyze** how actor-critic methods achieve biased but low-variance estimation through interaction with the environment.  
+6. **Discuss** the trade-offs between online and offline RL algorithms.  
+7. **Design** planning methods that incorporate model learning into RL.  
+
+---
+
 # Lesson 7-Tabular Methods: Temporal Difference Learning
 
 **Learning outcomes**
@@ -17,7 +30,7 @@ The settings are still the same as that of an MDP. However, we assume that the s
 
 
 **Reading**:
-The accompanying reading of this lesson is **chapter 6** of our text book available online [here](http://incompleteideas.net/book/RLbook2020.pdf). Please note that we explain the ideas of this topic from a practical perspective and not from a theoretical perspective which is already covered in the textbook.
+You may refer to chapter 6 of the text book available online [here](http://incompleteideas.net/book/RLbook2020.pdf). Please note that we explain the ideas of this topic from a practical perspective and not from a theoretical perspective which is already covered in the textbook.
 
 In this lesson, we cover the Temporal Difference learning method. TD is one of the fundamental ideas in RL. It uses bootstrapping to improve its predictions. The idea behind bootstrapping is to use (own estimation) to improve (own estimation) with an indication from the ground truth in the form of a reward. This sound surprising since we are not using a direct ground truth to revert to when we are improving the prediction. However, it turns out that there are theoretical guarantees that the method will converge to a solution that is usually *close to optimal*. The one constant stream of ground truth the agent keeps receiving is the rewards in each state. One of the major strengths of TD is that it can be used online without having to wait till the end of the episode as we did in the Monte Carlo methods. This also makes it extremely efficient and allows it to converge faster *in practice *than MC. TD uses ideas similar to what we did in GPI: slightly improving the prediction and *not* waiting until everything is clear (at the end of an episode). This idea is similar to what we did in stochastic mini-batch updates in ML. We will call it eagerness to learn. I.e., to grab whatever information is available and whenever it becomes available but at the same time keep accumulating a stock of this information to help us improve and sharpen our prediction. We will then move into designing control algorithms that depend on TD, we will tackle old and new algorithms, including Sarsa, Expected Sarsa, Q-learning and double Q-learning, and we will test them extensively using the infrastructure that we developed in the previous lesson. Finally, we conclude by studying a policy gradient algorithm for control, namely actor-critic, that depends on TD and REINFORCE.
 

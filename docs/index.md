@@ -17,82 +17,24 @@ While RL offers tremendous efficacy when configured appropriately, it is suscept
 
 Our module adopts a pragmatic approach, aiming to provide you with a solid theoretical grounding in RL without overly delving into intricate mathematical details. Simultaneously, we will attempt to equip you with practical skills and techniques to harness RL's benefits effectively. This balanced approach ensures that you grasp RL's essence while gaining valuable real-world application tools.
 
-
-**Unit 1 Learning outcomes**
-
-By the end of this unit, you be able to:  
-
-1. **Explain** the armed bandit problem and how isolating the action space simplifies decision-making.  
-2. **Describe** the value function and the action-value function, highlighting their essential roles in reinforcement learning (RL).  
-3. **Differentiate** between associative and non-associative problems in RL.  
-4. **Analyze** the theoretical foundations of RL, including Markov Decision Processes (MDPs) and the Bellman equation.  
-5. **Compare** prediction and control in RL settings, outlining their respective challenges and solutions.  
-
----
-
-**Unit 2: Learning Outcomes**  
-By the end of this unit, you be able to:  
-
-1. **Compute** the value function for a given policy in tabular settings.  
-2. **Implement** control methods that infer an agent’s policy from an action-value function.  
-3. **Explain** the concept of Generalized Policy Iteration (GPI) and how it underpins many RL methods.  
-4. **Compare** full-backup action-value-based control methods with direct policy estimation control methods.  
-5. **Evaluate** how Monte Carlo (MC) methods provide unbiased but high-variance estimates through interaction with the environment.  
-6. **Analyze** how REINFORCE achieves unbiased but high-variance policy gradient estimation through interaction with the environment.  
-
----
-
-**Unit 3: Learning Outcomes**  
-By the end of this unit, you be able to:  
-
-1. **Assess** the role of bootstrapping in RL and its impact on learning efficiency.  
-2. **Explain** n-step methods and the trade-offs associated with different values of n.  
-3. **Compare** n-step backup action-value-based control methods with direct policy estimation methods.  
-4. **Evaluate** how Temporal Difference (TD) methods obtain biased but low-variance estimates through environment interaction.  
-5. **Analyze** how actor-critic methods achieve biased but low-variance estimation through interaction with the environment.  
-6. **Discuss** the trade-offs between online and offline RL algorithms.  
-7. **Design** planning methods that incorporate model learning into RL.  
-
----
-
-**Unit 4: Learning Outcomes**  
-By the end of this unit, you be able to: 
-
-1. **Apply** RL techniques to control an agent in complex environment representations.  
-2. **Compare** the trade-offs of on-policy and off-policy learning algorithms.  
-3. **Evaluate** the convergence properties of RL algorithms in both tabular and function approximation settings, considering their practical limitations.  
-
----
-
-**Unit 5: Learning Outcomes**  
-By the end of this unit, you be able to:  
-
-1. **Predict** the value function for a policy using function approximation techniques.  
-2. **Explain** eligibility traces and the trade-offs associated with their depth.  
-3. **Implement** control methods that infer an agent’s policy from an action-value function with function approximation.  
-4. **Apply** RL techniques to control a robotic system.  
-
----
-
-**Unit 6: Learning Outcomes**  
-By the end of this unit, you be able to:
-
-1. **Apply** RL techniques to control an agent in game environments.  
-
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=2efc8e37-2e42-4b77-b694-b68994652e23&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="640" height="360" frameborder="0" scrolling="no" allowfullscreen title="Wecome Video.mkv"></iframe>
 
 
 ## RL in context: advantages and challenges
-In our RL coverage, you will notice that we do not do classical robotics and we believe it is not the way to go except possibly for industrial robots. So, we do not need motion planning or accurate trajectory calculations/kinematics to allow the robot to execute a task, we simply let it learn by itself how to solve the task and this is what reinforcement learning is about. In our coverage we also do not supervise or directly teach the robot, this type of interference is called imitation. 
+In our RL coverage, you will notice that we do not do classical robotics and we believe it is not the way to go except possibly for industrial robots. So, we do not need motion planning or accurate trajectory calculations/kinematics to allow the robot to execute a task, we simply let it interact with its environment and learn by itself how to solve the task and this is what reinforcement learning is about. In our coverage we also do not supervise or directly teach the robot, this type of interference is called imitation. 
 
 This is all great but what about challenges? Obviously, we still have several challenges to this approach. One is the number of experiments required to learn the task which can be numerous, which exposes the physical agents (real robots) to the risk of wear and tear due to repetition and can be very lengthy and tedious for the human that is supervising the task. This can be partially overcome by starting in simulation and then moving to a real robot with a technique called [sim-to-real](https://ai.googleblog.com/2021/06/toward-generalized-sim-to-real-transfer.html) where we can employ GANs(generative adversarial neural networks).  The other challenge is the time required for training regardless whether it is in simulation or in real scenarios. 
 
 
-The origin of these problems is actually the exploitation/exploration needed by RL algorithms which is in the heart of what we will be doing in all of our RL coverage. Reducing the amount of training required is important and remains an active area for research. One approach is via experience replay and the other is via eligibility traces as we shall see later.
+The origin of these problems is actually the exploitation/exploration needed by RL algorithms which is in the heart of what we will be exploring in all of our RL coverage. Reducing the amount of training required is important and remains an active area for research. One approach is via experience replay and the other is via eligibility traces as we shall see later.
 
 ## Textbook
-The accompanying textbook of this and consecutive units is the Sutton Barto book Introduction to RL available online [here](http://incompleteideas.net/book/RLbook2020.pdf). Please note that we explain the ideas of RL from a practical perspective and not from a theoretical perspective which is already covered in the textbook.
+<!-- The accompanying textbook of this and consecutive units is the Sutton Barto book Introduction to RL available online [here](http://incompleteideas.net/book/RLbook2020.pdf). You do not need to read the book's corresponding chapters, but they provide a further reading for you to understand the maetrial further and delve deeper into the subject.
+Please note that we explain the ideas of RL from a practical perspective and not from a theoretical perspective which is already covered in the textbook. -->
+The primary textbook for this unit and the following ones is Introduction to Reinforcement Learning by Sutton and Barto, available online [here](http://incompleteideas.net/book/RLbook2020.pdf). While reading the corresponding chapters is not required, they serve as valuable supplementary material to enhance your understanding and explore the subject in greater depth.
 
 **list of symbols**
+
 - $v0$: denotes an initial value
 - $θ$: denotes a threshold
 - $nS$: denotes state space dimension 
@@ -124,48 +66,68 @@ We cover the tabular solution methods in the first three units, while approximat
 
 Tabular and approximate solution methods fall under two types of RL methods that we will attempt to deal with 
 
-1. Prediction methods: AKA Policy Evaluation Methods that attempt to find the best estimate for the value-function or action-value function given a policy.
-2. Control methods: AKA Policy Improvement Methods that attempt to find the best policy, often by starting from an initial policy and then moving into a better and improved policy.
+1. Prediction methods: AKA Policy Evaluation Methods that attempt to find the best estimate for the value-function $V$ or action-value function $Q$ for a policy $\pi$.
+2. Control methods: AKA Policy Improvement Methods that attempt to find the best policy $\pi_*$, often by starting from an initial policy and then moving into a better and improved policy.
 
-Policy improvement methods:
-1. Methods that improve the policy via improving the action-value function
-2. Methods that improve the policy directly
+Control methods, or policy improvement methods, in turn, falls under two categories:
 
-We start by assuming that the policy is fixed. This will help us develop algorithms predicting the state‘s value function (expected return). Then, we will move to the policy improvement methods, i.e., methods that help us compare our policy with other policies and move to a better policy when necessary. Then, we move to the control case (policy and value iteration methods).
+1. Methods that improve the policy via improving the action-value function $Q$
+2. Methods that improve the policy directly $\pi$
+
+We start by assuming that the policy is fixed. This will help us develop algorithms predicting the state‘s value function (expected return). Then, we will move to the policy improvement methods, i.e., methods that help us compare our policy with other policies and move to a better policy when necessary. We then move to seamlessly integrating both for control case (policy and value iteration methods). Finally, we cover policy gradient methods that improve the policy directly.
 
 Note that the guarantee from the policy-improvement theorem no longer applies when we move from the table representation of the value function for small state space to the parametric function approximation representation for large state space. This will encourage us to move to direct policy-improvement methods instead of improving the policy via improving the value function.
 
-## VM and Prerequisite Packages 
 
-Video Introduction to [Azure VM](https://leeds365-my.sharepoint.com/:v:/g/personal/scsaalt_leeds_ac_uk/EWEwLfWr5w9Mnl0E29LjvJUBlsG-nWbee6RzKHKYSp_D-Q?e=V79IXI)
+## Table of Contents
+**Unit 1**
 
-We provide you with Azure VM which has [ROS 2 Foxy Fitzroy](https://docs.ros.org/en/foxy/Installation.html) already installed. ROS2 commands need to be run from the terminal not from a conda-activated terminal (due to compatibility), and they use the default system Python 3.8. The VM has the libraries required for ROS2 along with TurtleBot3 installed with the worlds required for assessment.
+1. [Tabular Methods](unit1/lesson1/lesson1.md)  
+2. [K-Arm Bandit](unit1/lesson2/lesson2.md)  
+3. [MDP](unit1/lesson3/lesson3.md)  
+4. [ROS](unit1/lesson4/lesson4.md)  
+
+**Unit 2**
+
+5. [Dynamic Programming](unit2/lesson5/lesson5.md)  
+6. [Monte Carlo](unit2/lesson6/lesson6.md)  
+7. [Mobile Robots](unit2/lesson7/lesson7.md)  
+
+**Unit 3**
+
+8. [Temporal Difference](unit3/lesson8/lesson8.md)  
+9.  [n-Step Methods](unit3/lesson9/lesson9.md)  
+10. [Planning in RL (optional)](unit3/lesson10/lesson10.md)  
+11. [Localisation and SLAM](unit3/lesson11/lesson11.md)  
+
+**Unit 4**
+
+12. [Function Approximation Methods](unit4/lesson12/lesson12.md)  
+13. [Linear Approximation for Prediction](unit4/lesson13/lesson13.md)  
+14. [Linear Approximation for Control](unit4/lesson14/lesson14.md)  
+
+**Unit 5**
+
+15. [Linear Approximation with Eligibility Traces (Prediction and Control)](unit5/lesson15/lesson15.md)  
+16. [Nonlinear Approximation for Control](unit5/lesson16/lesson16.md)  
+17. [Application on Robot Navigation](unit5/lesson17/lesson17.md)  
+
+**Unit 6**
+
+18. [Application on Games (optional)](unit6/lesson18/lesson18.md)  
 
 
-We have tested the notebooks on Python 3.8, so they should work smoothly for higher versions.
-Note that ROS2 code must be run with the default VM Python3.8 kernel. For the best experience, use VScode
 
-The machine has decent cores and memory (according to Azure 4 cores | 8GB RAM | 128GB Standard SSD). The VM has Ubuntu 20 and Xfce (Xubuntu) interface due to its lightweight (to give you the best experience remotely- to come as close as a local machine feeling) and it is tailored to give the same feeling as the usual Ubuntu Genome. You can run hardinfo in the terminal to check the VM specs. I hope you will enjoy it. 
-
-To access the VM, please use the usual remote desktop app available on your system. You will receive an email with access to your VM. The username is rl, and the password is rl@ros2. 
-
-
-You will have sudo access. Please apply caution when dealing with the system and avoid installing packages so as not to break it, which can be time-consuming. You will have around a 40-hour time limit, so please be mindful not to leave the system running unless necessary so as not to run out of time. Usually, you would want time for running the exercises and save plenty of time (1/2) for your project training (this is where the VM will be most useful).
-
-If the VM becomes corrupted for some reason, then you can reimage it by going to Azure Lab page and selecting the three dots, then reimage. That *will cause all the data you have on the machine to be lost*. You are advised to back up your data, you may want to use OneDrive or other backup methods.
-
-
-## Code Structure and Notebooks Cascade Dependency
-
-**Important note: Please place the downloaded libraries within the same folder of the all notebooks to allow the imports to work appropriately**
-
-We have provided you with two [RL libraries](/RLlibrary.zip){:download="RLlibrary.zip"} designed for this module. One has bespoke environments and one that has base RL classes that makes working with algorithms very easy and as close as it can be to just provide an update rule.
+## Code Structure and Notebooks Dependecies
 
 Worksheets can be cloned and launched in GitHub Codespaces (repo is: AltahhanAi/RL-worksheets)
 
 [![Open in GitHub Codespaces-](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?repository=AltahhanAi/RL-worksheets)
 
+We have provided you with two [RL libraries](/RLlibrary.zip){:download="RLlibrary.zip"} designed for this module. One has bespoke environments and one that has base RL classes that makes working with algorithms very easy and as close as it can be to just provide an update rule.
 
+
+**Important note: Please place all worksheets in one folder, and inside this folder you must have the downloaded libraries folders (env and rl) to allow the imports to work appropriately**
 
 
 ## Installing other libraries that will be needed later
@@ -176,14 +138,6 @@ Worksheets can be cloned and launched in GitHub Codespaces (repo is: AltahhanAi/
 !pip3 install scikit-learn
 !pip install matplotlib
 !pip3 install tqdm
-```
-
-<!--  neural networks and deep learning -->
-```
-!sudo apt install python3-testresources
-!pip3 install -U setuptools
-!pip3 install -U tensorflow[and-cuda]
-!pip3 install keras
 ```
 
 <!-- Better Readability -->
@@ -204,35 +158,4 @@ Worksheets can be cloned and launched in GitHub Codespaces (repo is: AltahhanAi/
 - !jt -r # resets back to the default theme
 
 ## Better Readability
-For better readability and experience, please use Jupyter Lab or Vcode(if you are using Azure VM) to navigate between the different notebooks easily. If you want to use Jupyter Notebooks and not Jupyter Lab, we recommend that you also increase the cells' width for a better reading experience. We provided a function that increase your notebook width which is envoked automatically when you import an environment (grid particularly) as you shall see later. You may want to utilise also the table of contents button in Jupetr Lab.
-
- - Unit 1: 
-   1. [Tabular Methods](unit1/lesson1/lesson1.md)
-   2. [K-Arm Bandit](unit1/lesson2/lesson2.md)
-   3. [MDP](unit1/lesson3/lesson3.md)
-   4. [ROS](unit1/lesson4/lesson4.md)
-
-  - Unit 2: 
-    5. [Dynamic Programming](unit2/lesson5/lesson5.md)
-    6. [Monte Carlo](unit2/lesson6/lesson6.md)
-    7. [Mobile Robots](unit2/lesson7/lesson7.md)
-
-  - Unit 3:
-    8. [Temporal Difference](unit3/lesson8/lesson8.md)
-    9. [n-Step Methods](unit3/lesson9/lesson9.md)
-    10. [Planning in RL(optional)](unit3/lesson10/lesson10.md)
-    11. [Localisation and SLAM](unit3/lesson11/lesson11.md)
-
-  - Unit 4: 
-    12. [Function Approximation Methods](unit4/lesson12/lesson12.md)
-    13. [Linear Approximation for Prediction](unit4/lesson13/lesson13.md)
-    14. [Linear Approximation for Control](unit4/lesson14/lesson14.md)
-    
-
-  - Unit 5: 
-    15. [Linear Approximation with Eligibility Traces(prediction and control)](unit5/lesson15/lesson15.md)
-    16. [Nonlinear Approximation for Control](unit5/lesson16/lesson16.md)
-    17. [Application on Robot Navigation](unit5/lesson17/lesson17.md)
-    
-  - Unit 6: 
-    18. [Application on Games(optional)](unit6/lesson18/lesson18.md)
+For better readability and experience, please use Jupyter Lab or Vcode(if you are using Azure VM) to navigate between the different notebooks easily. If you want to use Jupyter Notebooks and not Jupyter Lab, we recommend increasing the cells' width for a better experience. We provided a function that increase your notebook width which is envoked automatically when you import an environment (grid particularly). You may want to utilise also the table of contents button in Jupetr Lab.

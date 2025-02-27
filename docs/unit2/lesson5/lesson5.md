@@ -5,12 +5,17 @@ Please note that you will need permission from the author to use the code for re
 
 # Lesson 5- Dynamic Programming: Model-Based Approach
 
-**Learning outcomes**
-1. understand what we mean by the dynamics of the environment
-2. understand how the environment's dynamics are used in the Bellman equation
-3. use the dynamics to estimate the value function and the action-value function via dynamic programming 
-4. understand the policy improvement theorem
-5. understand the policy-iteration and value-iteration algorithms as the backbone of many RL algorithms
+**Unit 2: Learning Outcomes**  
+By the end of this unit, you will be able to:  
+
+1. **Compute** the value function for a given policy in tabular settings.  
+2. **Implement** control methods that infer an agent’s policy from an action-value function.  
+3. **Explain** the concept of Generalized Policy Iteration (GPI) and how it underpins many RL methods.  
+4. **Compare** full-backup action-value-based control methods with direct policy estimation control methods.  
+5. **Evaluate** how Monte Carlo (MC) methods provide unbiased but high-variance estimates through interaction with the environment.  
+6. **Analyze** how REINFORCE achieves unbiased but high-variance policy gradient estimation through interaction with the environment.  
+
+---
 
 In the first lesson, you looked at a basic RL problem, the k-arm bandit, which involves only actions and no states (non-associative problem). In general, in RL, we are faced with different situations, and we need to take different actions in each situation in order to achieve a certain goal. This general type of environment with states and actions imposes a different flavour to the solution we can design. From now on, we will tackle associative problems. For associative problems, there are two approaches:
 

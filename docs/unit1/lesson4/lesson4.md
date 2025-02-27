@@ -1,3 +1,9 @@
+
+
+
+
+
+
 # Basic ROS Concepts
 
 ![01-04.png](01-04.png)
@@ -24,6 +30,7 @@
     - [ROS Messages](#ros-messages)
     - [Robot Web Tools](#robot-web-tools)
     - [ROS Serial](#ros-serial)
+- [VM and Prerequisite Packages](#vm-and-prerequisite-packages)
 
  ## Basic ROS Terms
 
@@ -118,7 +125,34 @@ Robot Web Tools is a suite that allows most ROS information to be sent over the 
 ### ROS Serial
 [ROS Serial](http://wiki.ros.org/rosserial) allows ROS to talk with any serial device, primarily embedded controllers such as Arduino's.
 
-Now go ahead and try doing worksheet1-ros to experiement more with the ros concepts.
+# VM and Prerequisite Packages 
+
+<!-- Video Introduction to [Azure VM](https://leeds365-my.sharepoint.com/:v:/g/personal/scsaalt_leeds_ac_uk/EWEwLfWr5w9Mnl0E29LjvJUBlsG-nWbee6RzKHKYSp_D-Q?e=V79IXI) -->
+
+Please see the following video to get started with teh VM. 
+
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=f52d3061-e7ab-4c0f-9e5d-04dbd2e3bc95&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="640" height="360" frameborder="0" scrolling="no" allowfullscreen title="1- Introduction to Azure VM.mkv"></iframe>
+
+
+You should recieve an email inviting you to have access to an Azure VM. The VM has [ROS 2 Foxy Fitzroy](https://docs.ros.org/en/foxy/Installation.html) already installed. ROS2 commands need to be run from the terminal not from a conda-activated terminal (due to compatibility), and they use the default system Python 3.8. The VM has the libraries required for ROS2 along with TurtleBot3 installed with the worlds required for assessment.
+
+We have tested the notebooks on Python 3.8, so they should work smoothly for higher versions.
+Note that ROS2 code must be run with the default VM Python3.8 kernel. For the best experience, use VScode
+
+The machine has decent cores and memory (according to Azure 4 cores | 8GB RAM | 128GB Standard SSD). The VM has Ubuntu 20 and Xfce (Xubuntu) interface due to its lightweight (to give you the best experience remotely- to come as close as a local machine feeling) and it is tailored to give the same feeling as the usual Ubuntu Genome. You can run hardinfo in the terminal to check the VM specs. I hope you will enjoy it. 
+
+To access the VM, please use the usual remote desktop app available on your system. You will receive an email with access to your VM. The username is rl, and the password is rl@ros2. 
+
+
+You will have sudo access. Please apply caution when dealing with the system and avoid installing packages so as not to break it, which can be time-consuming. You will have around a 40-hour time limit, so please be mindful not to leave the system running unless necessary so as not to run out of time. Usually, you would want time for running the exercises and save plenty of time (1/2) for your project training (this is where the VM will be most useful).
+
+If the VM becomes corrupted for some reason, then you can reimage it by going to Azure Lab page and selecting the three dots, then reimage. That *will cause all the data you have on the machine to be lost*. You are advised to back up your data, you may want to use OneDrive or other backup methods.
+
+
+
+Now go ahead and try doing worksheet4 to experiement more with some of the ros concepts.
 
 [ROS Worksheet 4: Robotics Operating System](../../workseets/worksheet4.ipynb)
+
+
 
