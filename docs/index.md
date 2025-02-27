@@ -18,7 +18,7 @@ While RL offers tremendous efficacy when configured appropriately, but it is sus
 Our module adopts a pragmatic approach, aiming to provide participants with a solid theoretical grounding in RL without overly delving into intricate mathematical details. Simultaneously, we equip learners with practical skills and techniques to harness RL's benefits effectively. This balanced approach ensures that you grasp RL's essence while gaining valuable real-world application tools.
 
 
-**Unit 1 Learning outcomes..**
+**Unit 1 Learning outcomes**
 
 1. understand the armed bandit problem and its simplification of isolating the action space
 1. understand the value function and the action-value function and their essential roles in RL
