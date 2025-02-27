@@ -19,6 +19,7 @@ Our module adopts a pragmatic approach, aiming to provide you with a solid theor
 
 
 **Unit 1 Learning outcomes**
+
 By the end of this unit, you be able to:  
 
 1. **Explain** the armed bandit problem and how isolating the action space simplifies decision-making.  
