@@ -19,7 +19,8 @@ Our module adopts a pragmatic approach, aiming to provide you with a solid theor
 
 
 **Unit 1 Learning outcomes**
-By the end of this unit, students should be able to:  
+By the end of this unit, you be able to:  
+
 1. **Explain** the armed bandit problem and how isolating the action space simplifies decision-making.  
 2. **Describe** the value function and the action-value function, highlighting their essential roles in reinforcement learning (RL).  
 3. **Differentiate** between associative and non-associative problems in RL.  
@@ -29,7 +30,8 @@ By the end of this unit, students should be able to:
 ---
 
 **Unit 2: Learning Outcomes**  
-By the end of this unit, students should be able to:  
+By the end of this unit, you be able to:  
+
 1. **Compute** the value function for a given policy in tabular settings.  
 2. **Implement** control methods that infer an agent’s policy from an action-value function.  
 3. **Explain** the concept of Generalized Policy Iteration (GPI) and how it underpins many RL methods.  
@@ -40,7 +42,8 @@ By the end of this unit, students should be able to:
 ---
 
 **Unit 3: Learning Outcomes**  
-By the end of this unit, students should be able to:  
+By the end of this unit, you be able to:  
+
 1. **Assess** the role of bootstrapping in RL and its impact on learning efficiency.  
 2. **Explain** n-step methods and the trade-offs associated with different values of n.  
 3. **Compare** n-step backup action-value-based control methods with direct policy estimation methods.  
@@ -52,7 +55,8 @@ By the end of this unit, students should be able to:
 ---
 
 **Unit 4: Learning Outcomes**  
-By the end of this unit, students should be able to:  
+By the end of this unit, you be able to: 
+
 1. **Apply** RL techniques to control an agent in complex environment representations.  
 2. **Compare** the trade-offs of on-policy and off-policy learning algorithms.  
 3. **Evaluate** the convergence properties of RL algorithms in both tabular and function approximation settings, considering their practical limitations.  
@@ -60,7 +64,8 @@ By the end of this unit, students should be able to:
 ---
 
 **Unit 5: Learning Outcomes**  
-By the end of this unit, students should be able to:  
+By the end of this unit, you be able to:  
+
 1. **Predict** the value function for a policy using function approximation techniques.  
 2. **Explain** eligibility traces and the trade-offs associated with their depth.  
 3. **Implement** control methods that infer an agent’s policy from an action-value function with function approximation.  
@@ -69,7 +74,8 @@ By the end of this unit, students should be able to:
 ---
 
 **Unit 6: Learning Outcomes**  
-By the end of this unit, students should be able to:  
+By the end of this unit, you be able to:
+
 1. **Apply** RL techniques to control an agent in game environments.  
 
 
