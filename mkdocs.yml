@@ -60,7 +60,8 @@ theme:
     - navigation.sections
   font:
     text: Inter
-  favicon: ../img/favicon.jpg
+  favicon: ../docs/img/favicon.jpg
+  # ../img/favicon.jpg
 
 plugins:
   - search
