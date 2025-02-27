@@ -9,58 +9,69 @@ In each unit, you will learn essential RL ideas and algorithms and see how these
  
 There are also some lessons that familiarise you with robotics as an application domain, which covers some simple concepts in robotics without delving deep into classical robotics, which is outside the scope of this module. Our units conclude with a simple, practical tutorial on utilising a simulated robot. You will use the provided code to control a simulated mobile robot called TurtleBot. The lessons are meant to gradually build your ability to deal with atonomous agents in a simplified environment. The final project will focus on comparing different RL solutions to solve a simulated robot navigation problem. We will provide you access to an Azure Ubuntu virtual machine already set up with ROS2 to run the sheets. You do not need to set up your own VM.
 
-Reinforcement Learning (RL) is dedicated to acquiring an optimal policy to enhance agent performance. Traditionally, RL involves the agent seeking an optimal policy to maximise cumulative rewards garnered by navigating various environmental states. While the agent is commonly perceived as a physical entity interacting with its surroundings, it can also encompass abstract systems, with states representing system configurations or settings. Notably, recent RL advancements have ventured into novel territories, such as optimising language models like LLMs for perplexity or other metrics.
+Reinforcement Learning (RL) is dedicated to acquiring an optimal policy to enhance agent performance. Traditionally, RL involves the agent seeking an optimal policy to maximise cumulative discounted rewards garnered by navigating various environmental states. While the agent is commonly perceived as a physical entity interacting with its surroundings, it can also encompass abstract systems, with states representing system configurations or settings. Notably, recent RL advancements have ventured into novel territories, such as optimising language models like LLMs for perplexity or other metrics.
 
 In this module, our focus primarily revolves around simulated agents, aligning with the nature of our programme. However, the underlying principles remain universal and applicable across diverse scenarios. The concept of guiding learning through rewards is deeply ingrained in biological organisms, from complex human brains to single-cell organisms like amoebas, all driven by the innate urge to maximise survival and proliferation.
 
-While RL offers tremendous efficacy when configured appropriately, but it is susceptible to spectacular failure when its conditions are unmet. Its inherent stochasticity adds layers of complexity, contributing to its volatile nature. Nonetheless, this volatility serves as a catalyst for researchers to delve deeper into understanding the governing rules of RL processes.
+While RL offers tremendous efficacy when configured appropriately, it is susceptible to spectacular failure when its conditions are unmet. Its inherent stochasticity adds another layer of complexity, contributing to its volatile nature. Nonetheless, this volatility serves as a catalyst for researchers to delve deeper into understanding the governing rules of RL processes.
 
-Our module adopts a pragmatic approach, aiming to provide participants with a solid theoretical grounding in RL without overly delving into intricate mathematical details. Simultaneously, we equip learners with practical skills and techniques to harness RL's benefits effectively. This balanced approach ensures that you grasp RL's essence while gaining valuable real-world application tools.
+Our module adopts a pragmatic approach, aiming to provide you with a solid theoretical grounding in RL without overly delving into intricate mathematical details. Simultaneously, we will attempt to equip you with practical skills and techniques to harness RL's benefits effectively. This balanced approach ensures that you grasp RL's essence while gaining valuable real-world application tools.
 
 
 **Unit 1 Learning outcomes**
+By the end of this unit, students should be able to:  
+1. **Explain** the armed bandit problem and how isolating the action space simplifies decision-making.  
+2. **Describe** the value function and the action-value function, highlighting their essential roles in reinforcement learning (RL).  
+3. **Differentiate** between associative and non-associative problems in RL.  
+4. **Analyze** the theoretical foundations of RL, including Markov Decision Processes (MDPs) and the Bellman equation.  
+5. **Compare** prediction and control in RL settings, outlining their respective challenges and solutions.  
 
-1. understand the armed bandit problem and its simplification of isolating the action space
-1. understand the value function and the action-value function and their essential roles in RL
-1. understand the difference between associative and non-associative problems
-1. understand the underlying theory of RL including MDP and Bellman equation
-1. understand the difference between prediction and control in RL settings
+---
 
-**Unit 2 Learning outcomes**
+**Unit 2: Learning Outcomes**  
+By the end of this unit, students should be able to:  
+1. **Compute** the value function for a given policy in tabular settings.  
+2. **Implement** control methods that infer an agent’s policy from an action-value function.  
+3. **Explain** the concept of Generalized Policy Iteration (GPI) and how it underpins many RL methods.  
+4. **Compare** full-backup action-value-based control methods with direct policy estimation control methods.  
+5. **Evaluate** how Monte Carlo (MC) methods provide unbiased but high-variance estimates through interaction with the environment.  
+6. **Analyze** how REINFORCE achieves unbiased but high-variance policy gradient estimation through interaction with the environment.  
 
-1. understand how to predict the value function for a policy in tabular settings
-1. understand how to control an agent by inferring its policy from an action-value function
-1. understand the idea of generalised policy iteration (GPI) that is utilised by many RL methods
-1. understand the difference between full-backup action-value based control methods and direct policy estimation control methods
-1. understand how MC        obtains an unbiased but high-variance estimation via interaction with the environment
-1. understand how REINFORCE obtains an unbiased but high variance estimation via interaction with using the environment
+---
 
-**Unit 3 Learning outcomes**
+**Unit 3: Learning Outcomes**  
+By the end of this unit, students should be able to:  
+1. **Assess** the role of bootstrapping in RL and its impact on learning efficiency.  
+2. **Explain** n-step methods and the trade-offs associated with different values of n.  
+3. **Compare** n-step backup action-value-based control methods with direct policy estimation methods.  
+4. **Evaluate** how Temporal Difference (TD) methods obtain biased but low-variance estimates through environment interaction.  
+5. **Analyze** how actor-critic methods achieve biased but low-variance estimation through interaction with the environment.  
+6. **Discuss** the trade-offs between online and offline RL algorithms.  
+7. **Design** planning methods that incorporate model learning into RL.  
 
-1. appreciate the importance of bootstrapping and its essential role in RL
-1. understand n-steps methods and the trade-offs that n represents
-1. understand the difference between n-steps-backup action-value based control methods and direct policy estimation control methods
-1. understand how TD obtains a biased but low variance estimation via interaction with the environment
-1. understand how actor-critic obtains a biased but low variance estimation via interaction with using the environment
-1. understand online and offline algorithms tradeoffs
-1. understand planning methods and how to build a model along the way by learning
+---
 
-**Unit 4 Learning outcomes**
+**Unit 4: Learning Outcomes**  
+By the end of this unit, students should be able to:  
+1. **Apply** RL techniques to control an agent in complex environment representations.  
+2. **Compare** the trade-offs of on-policy and off-policy learning algorithms.  
+3. **Evaluate** the convergence properties of RL algorithms in both tabular and function approximation settings, considering their practical limitations.  
 
-1. apply RL to control an agent in a more complex environment representation
-1. understand on-policy and off-policy algorithms trade-offs 
-1. be familiar with the convergence of RL algorithms in tabular and approximation settings and their practical limitations
+---
 
-**Unit 5 Learning outcomes**
+**Unit 5: Learning Outcomes**  
+By the end of this unit, students should be able to:  
+1. **Predict** the value function for a policy using function approximation techniques.  
+2. **Explain** eligibility traces and the trade-offs associated with their depth.  
+3. **Implement** control methods that infer an agent’s policy from an action-value function with function approximation.  
+4. **Apply** RL techniques to control a robotic system.  
 
-1. understand how to predict the value function for a policy using function approximation
-1. understand eligibility traces methods and the trade-offs that their depth represents
-1. understand how to control an agent by inferring its policy from an action-value function with function approximation
-1. apply RL to control a robot
+---
 
-**Unit 6 Learning outcomes**
+**Unit 6: Learning Outcomes**  
+By the end of this unit, students should be able to:  
+1. **Apply** RL techniques to control an agent in game environments.  
 
-1. apply RL to control an agent in Games
 
 
 ## RL in context: advantages and challenges
