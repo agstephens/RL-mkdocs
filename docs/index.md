@@ -146,7 +146,9 @@ We have provided you with two [RL libraries](/RLlibrary.zip){:download="RLlibrar
 You can launch code directly here
 <!-- [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new/?repo=<your-repo>&ref=main) -->
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?repository=AltahhanAi/RL-mkdocs&ref=main&quickstart=1&file=docs/worksheets/worksheet2.ipynb)
+<!-- [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?repository=AltahhanAi/RL-mkdocs&ref=main&quickstart=1&file=docs/worksheets/worksheet2.ipynb) -->
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/new?repository=AltahhanAi/RL-mkdocs&ref=main&quickstart=1&file=docs/worksheets/worksheet2.ipynb)](https://github.com/codespaces/new?repository=AltahhanAi/RL-mkdocs&ref=main&quickstart=1&file=docs/worksheets/worksheet2.ipynb)
 
 
 <!-- /workspaces/my_notebooks/ -->
