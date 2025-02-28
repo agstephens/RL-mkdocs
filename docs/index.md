@@ -116,19 +116,14 @@ Note that the guarantee from the policy-improvement theorem no longer applies wh
 
 18. [Application on Games (optional)](unit6/lesson18/lesson18.md)  
 
-
-
 ## Code Structure and Notebooks Dependecies
 
-Worksheets can be cloned and launched in GitHub Codespaces (repo is: AltahhanAi/RL-worksheets)
-
-[![Open in GitHub Codespaces-](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?repository=AltahhanAi/RL-worksheets)
+<!-- Worksheets can be cloned and launched in GitHub Codespaces (repo is: AltahhanAi/RL-worksheets)
+[![Open in GitHub Codespaces-](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?repository=AltahhanAi/RL-worksheets) -->
 
 We have provided you with two [RL libraries](/RLlibrary.zip){:download="RLlibrary.zip"} designed for this module. One has bespoke environments and one that has base RL classes that makes working with algorithms very easy and as close as it can be to just provide an update rule.
 
-
-**Important note: Please place all worksheets in one folder, and inside this folder you must have the downloaded libraries folders (env and rl) to allow the imports to work appropriately**
-
+**Important note: Please place all worksheets in one folder, and inside this folder you must have the downloaded libraries folders (env and rl) to allow the imports to work appropriately**.
 
 ## Installing other libraries that will be needed later
 <!-- general -->
