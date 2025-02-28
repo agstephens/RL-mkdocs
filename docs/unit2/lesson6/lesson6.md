@@ -1,6 +1,7 @@
 # Lesson 5-Tabular Methods: Monte Carlo
 
 **Learning outcomes**
+
 1. understand the difference between learning the expected return and computing it via dynamic programming
 1. understand the strengths and weaknesses of MC methods
 1. appreciating that MC methods need to wait till the end of the task to obtain its estimate of the expected return
