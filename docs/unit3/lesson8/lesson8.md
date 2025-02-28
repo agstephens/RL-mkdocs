@@ -1,8 +1,3 @@
-Author: Abdulrahman Altahhan, 2025
-
-The notebook uses a library of functionality in RL that aims for simplicity and general insight into how algorithms work, these libraries are written from scratch using standard Python libraries (numpy, matplotlib etc.).
-Please note that you will need permission from the author to use the code for research, commercially or otherwise.
-
 # Introduction to Bootstrapping
 In this and subsequent units, we cover a set of RL algorithms that use bootstrapping, a powerful idea that allows us to create online updates that do not wait until the end of an episode to learn from the experience, live as it comes. We will continue on the tabular method, cover planning, and then move to function approximation methods. Along the way, we cover encoding techniques for state space traditionally used in RL, such as tile coding. On the function approximation, we will assume a linear model in this unit. We cover non-linear models from an application perspective in the subsequent unit. We are mainly concerned with regression not classification from a machine learning perceptive.
 
@@ -24,13 +19,11 @@ By the end of this unit, you will be able to:
 # Lesson 7-Tabular Methods: Temporal Difference Learning
 
 **Learning outcomes**
+
 1. understand the idea of bootstrapping and how it is being used in TD
 2. understand the differences between MC and TD and appreciate their strengths and weaknesses
 3. understand how to use the ideas of TD to extend it to a control method such as Sarsa and Q-learning
 
-
-**Reading**:
-You may refer to chapter 6 of the text book available online [here](http://incompleteideas.net/book/RLbook2020.pdf). Please note that we explain the ideas of this topic from a practical perspective and not from a theoretical perspective which is already covered in the textbook.
 
 In this lesson, we cover the Temporal Difference learning method. TD is one of the fundamental ideas in RL. It uses bootstrapping to improve its predictions. The idea behind bootstrapping is to use (own estimation) to improve (own estimation) with an indication from the ground truth in the form of a reward. This sound surprising since we are not using a direct ground truth to revert to when we are improving the prediction. However, it turns out that there are theoretical guarantees that the method will converge to a solution that is usually *close to optimal*. The one constant stream of ground truth the agent keeps receiving is the rewards in each state. One of the major strengths of TD is that it can be used online without having to wait till the end of the episode as we did in the Monte Carlo methods. This also makes it extremely efficient and allows it to converge faster *in practice *than MC. TD uses ideas similar to what we did in GPI: slightly improving the prediction and *not* waiting until everything is clear (at the end of an episode). This idea is similar to what we did in stochastic mini-batch updates in ML. We will call it eagerness to learn. I.e., to grab whatever information is available and whenever it becomes available but at the same time keep accumulating a stock of this information to help us improve and sharpen our prediction. We will then move into designing control algorithms that depend on TD, we will tackle old and new algorithms, including Sarsa, Expected Sarsa, Q-learning and double Q-learning, and we will test them extensively using the infrastructure that we developed in the previous lesson. Finally, we conclude by studying a policy gradient algorithm for control, namely actor-critic, that depends on TD and REINFORCE.
 
@@ -44,21 +37,6 @@ For These problems we will design Policy Evaluation Methods that attempt to find
 
 2. Control problems 
 For These problems we will design Value Iteration methods which utilise the idea of Generalised Policy Iteration. They attempt to find the best policy, via estimating an action-value function for a current policy then moving to a better and improved policy by choosing a greedy action often. We will then move to Policy Gradient methods that directly estimate a useful policy for the agent by maximising its value function.
-
-
-
-```python
-%matplotlib inline
-```
-
-
-```python
-from rl.rl import *
-```
-
-
-<style>.container {width:90% !important}</style>
-
 
 Ok, so we start by implementing the TD algorithm. Due to the way we structured our code and classes, it is relatively simple and straightforward to define any online and offline methods. TD is an online method that will be called in *each step during an episode*. We, therefore, can turn off the storage because we do not need it, but leaving it will not hurt the grid problems we are tackling. It will consume some memory and a few extra milliseconds of processing. For more difficult problems, we need to utilise the memory to train anyway, as we shall see in the Application unit.
 
@@ -85,31 +63,8 @@ Let us test our brand new TD algorithm on the random walk prediction problem. No
 TDwalk = TD(episodes=100, v0=.5, **demoV())
 TDwalk.interact(label='TD learning')
 ```
-
-
-
-
-    <__main__.TD at 0x1258e5a60>
-
-
-
-
-    
 ![png](output_13_1.png)
     
-
-
-
-```python
-TDwalk.store
-```
-
-
-
-
-    False
-
-
 
 Note that we did not need to store the episodes trajectories in a pure online method, hence these methods are usually more memory efficient that there offline counterpart!
 Note how TD performed far better and converged faster in fewer episodes than MC
@@ -120,9 +75,6 @@ Of course we can call interact immediately  as follows.
 ```python
 TDwalk = TD(episodes=100, v0=.5, **demoV()).interact(label='TD learning')
 ```
-
-
-    
 ![png](output_17_0.png)
     
 
@@ -153,10 +105,7 @@ class TDf(MRP):
 
 ```python
 TDwalk = TDf(α=.05, episodes=100, v0=.5, **demoV()).interact(label='TD learning')
-```
-
-
-    
+``` 
 ![png](output_20_0.png)
     
 
@@ -167,90 +116,9 @@ We could have also made the algorithm go backwards, similar to MC. Each has its 
 
 ## Conducting trials(several runs) of experiments
 
-Let us now create a useful handy class that summarizes several runs for us to reach a reliable and unbiased conclusions when we compare algorithms performances.
+Let us now use a useful handy class called 'run' that summarises several runs for us to reach a reliable and unbiased conclusions when we compare algorithms performances.
 
-
-```python
-class Runs: # experimental trials
-
-    def __init__(self, 
-                 algorithm=None,
-                 runs=10, 
-                 plotR=False, 
-                 plotT=False, 
-                 plotE=False,
-                 **kw): 
-        
-        self.algorithm = algorithm if algorithm is not None else MRP(**kw)
-        self.runs = runs
-        self.plotR = plotR
-        self.plotT = plotT
-        self.plotE = plotE
-        
-       
-    def header(self):
-        return 'runs|'          + self.algorithm.header()
-    def values(self, results):
-        return '%4d|'%self.runs + self.algorithm.values(results)
-   
-    def init(self):
-        np.random.seed(1)# for binomial, choice and randint
-        random.seed(1)   # for using choices
-        
-        self.Rs = np.zeros((self.runs, self.algorithm.episodes))
-        self.Ts = np.zeros((self.runs, self.algorithm.episodes))
-        self.Es = np.zeros((self.runs, self.algorithm.episodes))
-    
-    def isplot(self):
-        return self.plotR or self.plotT or self.plotE
-
-    def interact(self, label='', frmt='-', **kw):
-        self.init()
-        runs,  algorithm = self.runs, self.algorithm
-        if not label: 
-            label = 'no label passed'
-        
-        start_time = time.time()
-        for self.run in range(runs):
-            run = self.run
-
-            # visual env in the last run, usually no need to visualise other runs
-            visual = algorithm.visual and run==runs-1  
-            label_ = ', run=%d'%(run+1)
-            
-            algorithm = algorithm.interact(visual=visual, label=label_, seed=run, **kw)
-            self.Rs[run] = algorithm.Rs 
-            self.Ts[run] = algorithm.Ts
-            self.Es[run] = algorithm.Es            
-            self.runstime = progress(self.run, runs, start_time, self.isplot())
-        
-        if self.isplot(): self.plot(label, frmt)
-        
-        return self
-            
-    def plot(self, label='', frmt='-') :
-        Rs, Ts, Es, algorithm = self.Rs, self.Ts, self.Es, self.algorithm
-        label_ =' averaged over %d runs'%(self.runs)
-        if self.plotT: plt.plot(algorithm.eplist, Ts.mean(0), frmt, label=label); plt.xlabel('episodes,'+label_); plt.legend()
-        if self.plotR: plt.plot(algorithm.eplist, Rs.mean(0), frmt, label=label); plt.xlabel('episodes,'+label_); plt.legend()
-        if self.plotE: plt.plot(algorithm.eplist, Es.mean(0), frmt, label=label); plt.xlabel('episodes,'+label_); plt.legend()
-        
-        return self
-
-# ============================ useful progress bar ======================================
-'''
-    useful progress bar function we can use tqdm but it does not play well sometime
-'''
-def progress(i, I, start, show=True, color=0):
-    if show:
-        percent = int(100 * (i+1)//I)
-        print(f'\r{percent}%|\033[9{color}m{"█" * int(percent*.9)}\033[0m|{i+1}/{I}', \
-              end='\r' if i+1<I else '\n')
-
-    return int((time.time()- start)*1000)
-```
-
-Note how the class allows us to run several experiments efficiently. The main assumption is that the algorithms are inherited from an MRP class which applies for the majority of the classes that we will deal with in our units.
+Note that the class allows us to run several experiments efficiently. The main assumption is that the algorithms are inherited from an MRP class which applies for the majority of the classes that we will deal with in our units.
 
 Let us now see how we can use this new class to easily run experiments to study how an algorithm behaves. Below we show a function that compares TD with MC on different learning rates. You can read about this comparison and the associated figure in Example 6.2 of the book (hence the function's name). We will follow this trend of naming functions after their counterpart examples or figures in the book.
 
@@ -270,34 +138,10 @@ def TD_MC_randwalk(env=randwalk(), alg1=TDf, alg2=MC):
 def example_6_2(**kw): return TD_MC_randwalk(**kw)
 
 example_6_2()
-```
-
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-
-
-
-    
+``` 
 ![png](output_27_1.png)
     
-
-
 We have already imported MC to compare its performance with our newly defined offline TD. Remember that MC is also offline algorithm.
-
-Note that we could have simply defined  
-
-example_6_2=TD_MC_randwalk
-
-and then call it as
-
-example_6_2()
-
-but that would make importing it in other lessons harder.
 
 ## Optimality of TD
 In this section, we study the optimality of TD. We develop two algorithms, Batch TD and Batch MC. Both of these algorithms operate in a **supervised learning fashion**. We collect a set of episodes and then deal with them as mini-batches, and then we run a set of epochs that repeatedly present the so-far experience until the algorithm converges. We use TD and MC updates inside the algorithm to see which value each converges to. By doing so, we have levelled up the strength of both algorithms (both are offline and wait until the end of each episode to accommodate all past experiences after each episode), and we laid their performance on pure convergence terms.
@@ -362,10 +206,7 @@ class TD_batch(MRP_batch):
 
 ```python
 TDwalk_batch = TD_batch(episodes=100, v0=-1, **demoV()).interact()
-```
-
-
-    
+```    
 ![png](output_33_0.png)
     
 
@@ -399,12 +240,9 @@ class MC_batch(MRP_batch):
             self.V += ΔV
 ```
 
-
 ```python
 MCwalk_batch = MC_batch(episodes=100, v0=-1, **demoV()).interact()
 ```
-
-
     
 ![png](output_36_0.png)
     
@@ -420,19 +258,9 @@ We start with 10 runs to show the full range that the algorithm will take in the
 α=.001
 TDB = Runs(algorithm=TD_batch(v0=-1, α=α, episodes=100), runs=3, plotE=True).interact(label= 'Batch TD, α= %.3f'%α)
 MCB = Runs(algorithm=MC_batch(v0=-1, α=α, episodes=100), runs=3, plotE=True).interact(label='Batch MC, α= %.3f'%α)
-
-```
-
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|3/3
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|3/3
-
-
-
-    
+``` 
 ![png](output_38_1.png)
     
-
-
 
 ```python
 def figure_6_2():
@@ -447,15 +275,9 @@ def figure_6_2():
     MCB = Runs(algorithm=MC_batch(v0=-1, α=α, episodes=100), runs=100, plotE=True).interact(label='Batch MC, α= %.3f'%α)
 ```
 
-
 ```python
 figure_6_2()
 ```
-
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-
-
 
     
 ![png](output_40_1.png)
@@ -488,76 +310,15 @@ Let us now apply the Sarsa on a simple grid world environment. The goal is direc
 
 ```python
 env2x3 = Grid(gridsize=[2, 3], reward='reward_', s0=0, goals=[5], figsize=[10,1])
-env2x3.render(underhood='maxQ')
 ```
-
-
-    
-![png](output_47_0.png)
-    
-
-
-
-```python
-Qs1 = np.array([.1,	.4	,.0	, .3])
-(np.exp(Qs1)/np.exp(Qs1).sum()).round(2)
-```
-
-
-
-
-    array([0.22, 0.3 , 0.2 , 0.27])
-
-
-
 
 ```python
 sarsa = Sarsa(env=env2x3, α=.1, γ=.9, episodes=10, store=True, seed=0, **demoQ())
 sarsa.interact()
 ```
-
-
-
-
-    <__main__.Sarsa at 0x125c49f70>
-
-
-
-
     
 ![png](output_49_1.png)
     
-
-
-
-```python
-sarsa.s[:sarsa.t+2]
-```
-
-
-
-
-    array([0, 1, 4, 5], dtype=uint32)
-
-
-
-
-```python
-sarsa.Q
-```
-
-
-
-
-    array([[0.        , 0.05685457, 0.        , 0.        ],
-           [0.        , 0.        , 0.        , 0.23751096],
-           [0.        , 0.        , 0.        , 0.        ],
-           [0.        , 0.        , 0.        , 0.        ],
-           [0.        , 0.65132156, 0.        , 0.        ],
-           [0.        , 0.        , 0.        , 0.        ]])
-
-
-
 
 ```python
 sarsa = Sarsa(env=grid(), α=.8, episodes=50, seed=10, **demoQ()).interact()
@@ -573,56 +334,24 @@ sarsa = Sarsa(env=grid(), α=.8, episodes=50, seed=10, **demoQ()).interact()
 ```python
 %time sarsa = Sarsa(env=grid(reward='reward_1'), q0=10, ε=.4, α=.3, episodes=20000, seed=1, **demoQ()).interact()
 ```
-
-    CPU times: user 4.85 s, sys: 416 ms, total: 5.26 s
-    Wall time: 3.89 s
-
-
-
-    
 ![png](output_53_1.png)
     
-
-
-
-```python
-sarsa = Sarsa(env=grid(reward='reward100'), α=.3, episodes=20, seed=1, **demoQ()).interact()
-```
-
-
-    
-![png](output_54_0.png)
-    
-
-
 
 ```python
 mc = MCC(env=grid(reward='reward100'), α=.3, episodes=20, seed=1, **demoQ()).interact()
 ```
-
-
-    
 ![png](output_55_0.png)
     
 
-
 Note how Sarsa performed better and converged faster in fewer episodes than MCC
-
 
 ```python
 %time sarsa = Sarsa(env=grid(reward='reward100'),  α=.3, episodes=20, seed=1, plotT=True).interact(label='Sarsa')
 %time mc = MCC(env=grid(reward='reward100'), α=.3, episodes=20, seed=1, plotT=True).interact(label='MCControl')
 ```
-
-    CPU times: user 60.4 ms, sys: 14.4 ms, total: 74.8 ms
-    Wall time: 25 ms
-
-
-
     
 ![png](output_57_1.png)
     
-
 
 Of course we change the seed the performance will change for both. Also if we change the learning rate α the performance will vary (change the seed to 0 and run). This is why it is important to conduct several runs in order to obtain the performance of the algorithms on average.
 
@@ -784,22 +513,13 @@ def example_6_6(**kw): return Sarsa_Qlearn_cliffwalk(**kw)
 SarsaCliff, QlearnCliff = Sarsa_Qlearn_cliffwalk()
 ```
 
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|200/200
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|200/200
-
-
-
     
 ![png](output_78_1.png)
-    
-
 
 
 ```python
 sarsa = Sarsa(env=maze(reward='reward1'), episodes=20, seed=10, **demoQ()).interact()
 ```
-
-
     
 ![png](output_79_0.png)
     
@@ -826,8 +546,6 @@ Note that the policy is assumed to be ε-greedy, if you want to deal with other 
 ```python
 xsarsa = XSarsa(env=cliffwalk(), α=.5, episodes=50, seed=1, **demoR()).interact()
 ```
-
-
     
 ![png](output_83_0.png)
     
@@ -882,19 +600,12 @@ SarsaCliff.plot(label='Sarsa', frmt='-')
 QlearnCliff.plot(label='Q-learning', frmt='-')
 XSarsaCliff, DQlearnCliff = XSarsaDQlearnCliff()
 ```
-
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|300/300
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|300/300
-
-
-
     
 ![png](output_90_1.png)
     
 
 
 ### Comparison on the Maze
-
 
 ```python
 def compareonMaze(runs=100, α=.5):
@@ -918,42 +629,16 @@ def compareonMaze(runs=100, α=.5):
 ```python
 SarsaMaze, XSarsaMaze, QlearnMaze, DQlearnMaze = compareonMaze(α=.5)
 ```
-
-
-    
-![png](output_93_0.png)
-    
-
-
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-
-
-
     
 ![png](output_93_2.png)
-    
 
 
 
 ```python
 SarsaMaze, XSarsaMaze, QlearnMaze, DQlearnMaze = compareonMaze(α=.7)
 ```
-
-
     
 ![png](output_94_0.png)
-    
-
-
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-
-
 
     
 ![png](output_94_2.png)
@@ -1213,111 +898,9 @@ ac_large = Actor_Critic(env=maze_large(), α=.1, τ=.3, γ=1, episodes=500, seed
 
 
 ## Model selection: methods comparisons class
-Ok, the question is, which one of these algorithms would perform best regardless of the learning rate α? To be able to know, we would need to compare the performances on a set of α values to see the full picture. To that end, we will finally develop a useful comparison class. It will allow us to compare algorithms with different hyperparameters similar to what we did in other machine learning modules. All that is required is to specify which hyperparameter we want to vary and then pass the values we want to test for in a dictionary.
+Ok, the question is, which one of these algorithms would perform best regardless of the learning rate α? To be able to know, we would need to compare the performances on a set of α values to see the full picture. To that end, we developed a useful comparison class. It allows us to compare algorithms with different hyperparameters similar to what we did in other machine learning modules. All that is required is to specify which hyperparameter we want to vary and then pass the values we want to test for in a dictionary.
 
-
-```python
-import time
-
-class Compare:
-    
-    def __init__(self, 
-                 algoruns=None,
-                 hyper={'α':np.round(np.arange(.1,1,.2),1)},
-                 plotR=False, 
-                 plotT=False,
-                 plotE=False,
-                 print=False, 
-                 **kw):
-        
-        self.algoruns = algoruns if algoruns is not None else Runs(**kw)
-        self.hyper = hyper
-        self.plotR = plotR
-        self.plotT = plotT
-        self.plotE = plotE
-        self.print = print
-    
-    def isFunction(self, hyperval): 
-        return isinstance(hyperval, str) # not in ['α','γ','ε','λ']
-
-    def compare(self, label='',frmt='-', **kw):
-            
-        algoruns = self.algoruns
-        algorithm  = self.algoruns.algorithm
-        runs, episodes = algoruns.runs, algorithm.episodes
-        
-        hypername = list(self.hyper.keys())[0]
-        hypervals = list(self.hyper.values())[0]
-        nhypervals = len(hypervals)
-
-        self.Rs = np.zeros((nhypervals, runs, episodes))
-        self.Ts = np.zeros((nhypervals, runs, episodes))
-        self.Es = np.zeros((nhypervals, runs, episodes))
-        
-        # now call the algorithm for each parameters set
-        if self.print: print(algoruns.header())
-        start = time.time()
-        for h, hyperval in enumerate(hypervals):
-            
-            if self.isFunction(hyperval):  
-                  label_ =   '%s'% hyperval; hyperval = getattr(algorithm, hyperval)
-            else: label_ = '%.4f'% hyperval
-            setattr(algorithm, hypername, hyperval)
-
-            algoruns.interact(label= '%s %s=%s'%(label, hypername, label_), **kw)
-            
-            self.Rs[h] = algoruns.Rs
-            self.Ts[h] = algoruns.Ts
-            self.Es[h] = algoruns.Es
-            
-            # take the mean over the trials
-            results = (algoruns.Rs.mean(), algoruns.Ts.mean(), algoruns.Es.mean())
-            if self.print: print(algoruns.values(results))
-            # for the progress bar we use a differernt color for compare
-            self.comparetime = progress(h, len(hypervals), start, color=2)
-
-        if self.print: print('comparison time = %.2f'% self.comparetime,'\n')
-        if self.plotR or self.plotT or self.plotE: self.plot(label=label, frmt=frmt)
-            
-        return self
-            
-    def plot(self, label, frmt):
-        hypername = list(self.hyper.keys())[0]#'α'
-        hypervals = list(self.hyper.values())[0]
-        ishyperNum= not self.isFunction(hypervals[0])
-        hyperrng  = hypervals if ishyperNum else list(range(len(hypervals)))
-        # [.1, .2, .3, .4...,1], ['reward0', 'reward1', 'reward10']
-
-        compareGT = [self.plotR, self.plotT, self.plotE ]
-        labels    = ['Rewards', 'Steps', 'Errors']
-        cs        = ['r', 'b', 'g']
-        
-        plt.gca().spines['right'].set_visible(False)
-        plt.gca().spines['top'].set_visible(False)
-        
-        HyperMeansGT = [self.Rs.mean(axis=(1,2)), self.Ts.mean(axis=(1,2)), self.Es.mean(axis=(1,2))]
-        for h, HyperMeans in enumerate(HyperMeansGT):
-            
-            # plot if it is required
-            if not compareGT[h]: continue
-            
-            if label: plt.plot(hyperrng, HyperMeans, frmt, label=label)
-            else:     plt.plot(hyperrng, HyperMeans, cs[h]+'--', label=labels[h])
-            plt.xlabel(hypername, fontsize=14)
-            plt.legend()
-            
-            # need to annotate if the hyper parameters are policy or rewards etc
-            if ishyperNum: continue  
-            bottom, top = plt.ylim()
-            for i, hval in enumerate(HyperMeans):
-                anot = str(hypervals[i]) +', %s'%hval
-                plt.annotate(anot, xy=(i,hval+.1))
-                
-        
-        return self
-```
-
-Now we can compare different α values to specify which algorithm is dominant. This study can be seen in Figure 6.3 in the book. Here we do 10 runs because it takes longer to do more, but you are welcome to try to run it for 100 runs. Note that the asymptotic study will run for 1000. the idea here is to compare the performances of the above control algorithms and variants of Q-learning and Sarsa in a systematic manner. The domain is the cliff walking environment. We want to see which algorithms (Sarsa, expected Sarsa, Q-learning, double Q-learning) perform best regardless of the learning rate. Such comparison would give us a definitive answer on which algorithm is best for the given problem when we see a pattern of dominance for all learning rate values.
+We can compare different α values to specify which algorithm is dominant. This study can be seen in Figure 6.3 in the book. Here we do 10 runs because it takes longer to do more, but you are welcome to try to run it for 100 runs. Note that the asymptotic study will run for 1000. the idea here is to compare the performances of the above control algorithms and variants of Q-learning and Sarsa in a systematic manner. The domain is the cliff walking environment. We want to see which algorithms (Sarsa, expected Sarsa, Q-learning, double Q-learning) perform best regardless of the learning rate. Such comparison would give us a definitive answer on which algorithm is best for the given problem when we see a pattern of dominance for all learning rate values.
 
 
 ```python
@@ -1353,16 +936,6 @@ def figure_6_3(runs=10, Interim=True, Asymptotic=True, episodes=100,  label=''):
     
 Interim_, Asymptotic_ = figure_6_3()
 ```
-
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|19/19
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|19/19
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|19/19
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|19/19
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|19/19
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|19/19
-
-
-
     
 ![png](output_128_1.png)
     
@@ -1375,13 +948,11 @@ As we can see the expected Sarsa performed best in the interim and on the asympt
 In this lesson, we have further developed our understanding of important and prominent RL online algorithms that are widely used, all based on the value iteration idea. I.e., we keep improving our policy and refining our value-function iteratively in each step until convergence. All of our algorithms are based on the Temporal Difference method. TD uses bootstrapping in its update; instead of using a true return of a state, it uses the current reward + its own estimation of the return for the next state. It is quite surprising to see how well TD works in practice. TD has been proven to converge to a good solution under some basic conditions regarding the learning rate. In practice, however, we assign a fixed small learning rate that works just fine. It is desirable that the learning rate is not decayed when the environment’s dynamics are expected to change.
 We have further used TD update in a few control algorithms. Most notable are the Sarsa and Q-learning. The first is an on-policy, while the latter is an off-policy control algorithm. We have compared all algorithms on different problems, studied their strengths and weaknesses, and how they are expected to behave on a certain problem.
 
+
+**Further Reading**:
+For further reading you can consult chapter 6 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf).
+
+
 ## Your turn
-
-1. Create a class that implements an offline TD algorithm. Take inspiration from the MC class.
-2. Change the policy in the XSarsa to softmax, you would need to add the probability function in the MDP that deals with the softmax and then 
-3. apply Sarsa and Q-learning on a 8 action maze environment by assigning the env=maze8() and study the differences in the way the agent changes its policy and it behaviour.
-
-## Challenge
-
-You can challenge yourself by trying to implement a dynamic environment that changes its obstacles at a specific episode
+Now it is time to experiemnt further and interact with code in [worksheet8](../../workseets/worksheet8.ipynb).
 

@@ -440,7 +440,7 @@ We finally saw how the value-iteration algorithm has a similar structure to the 
 
 In the next lesson, we will take a different approach and move to cover sampling methods that do not use the dynamics of the environment explicitly and instead try to improve its policy by interacting with the environment.
 
-**Reading**:
+**Further Reading**:
 For further reading you can consult chapter 4 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf).
 
 
