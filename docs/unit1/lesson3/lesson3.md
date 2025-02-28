@@ -21,77 +21,51 @@
 1. be able to execute actions in a grid world and observe the result
 2. be able to to visualise a policy and its action-value function -->
 
-## 1. Markov Decision Process (MDP)
+## Markov Decision Process (MDP)
 
 A **Markov Decision Process (MDP)** provides a mathematical framework to model decision-making problems where an agent interacts with an environment. It is characterized by a tuple \( (S, A, P, R, \gamma) \) where:
 
 - \( S \) is the set of states in the environment.
 - \( A \) is the set of actions available to the agent.
-- \( P(s' | s, a) \) is the **transition function**, representing the probability of transitioning from state \( s \) to state \( s' \) after taking action \( a \).
+- \( P(s', r | s, a) \) is the **dynamics model**, representing the probability of transitioning to state \( s' \) and receiving reward \( r \) given the current state \( s \) and action \( a \).
 - \( R(s, a, s') \) is the **reward function**, representing the immediate reward received when transitioning from state \( s \) to state \( s' \) after taking action \( a \).
 - \( \gamma \) is the **discount factor**, a value between 0 and 1 that determines the importance of future rewards relative to immediate rewards.
 
 The MDP framework is central to reinforcement learning (RL), as it allows the agent to plan and optimize its actions over time to maximize the expected return.
 
 
-### Markov Property
-
-The **Markov Property** asserts that the future state depends only on the current state and action, not on any previous states or actions. This is a core assumption in MDPs and ensures that the system has **no memory** of past actions or states.
-
-Formally:
-
-\[
-P(s_{t+1} | s_t, a_t, \dots, s_0, a_0) = P(s_{t+1} | s_t, a_t)
-\]
-
-### Stationarity
-
-In many MDPs, the transition and reward functions are **stationary**, meaning that they do not change over time. This ensures that the transition probabilities and rewards are the same at every time step.
-
-Formally:
-
-\[
-P(s' | s, a) = P(s' | s, a) \quad \forall t
-\]
-
 ### Deterministic vs. Stochastic Dynamics
 
-- **Deterministic Dynamics**: If the transition function \( P(s' | s, a) \) always produces the same next state, the system is deterministic.
-- **Stochastic Dynamics**: If \( P(s' | s, a) \) is probabilistic, the system is stochastic.
+- **Deterministic Dynamics**: If the transition and reward function \( P(s', r | s, a) \) assigns probability 1 to a single next state \( s' \) and reward \( r \), meaning the next state and reward are fully determined by \( s \) and \( a \), the system is deterministic. This implies that \( P(s' | s, a) \) always results in the same \( s' \), and the reward function \( R(s, a, s') \) is fixed.  
 
-### Reward Structure
+- **Stochastic Dynamics**: If \( P(s', r | s, a) \) defines a probability distribution over possible next states and rewards, the system is stochastic. This means the transition probability \( P(s' | s, a) \) is non-deterministic, and the reward \( R(s, a, s') \) can vary for the same transition. 
 
-The **reward function** \( R(s, a, s') \) can either be **deterministic** (fixed reward) or **stochastic** (random reward). The structure of the rewards influences the agent's behavior and learning.
-
-### Irreducibility and Aperiodicity
-
-For algorithms like **Value Iteration**, it is important that the MDP is **irreducible** (all states are reachable from any other state) and **aperiodic** (there are no cycles of fixed lengths that prevent convergence).
-
----
-
-
-## 2. Policy and its Stationarity
+  
+  
+## The Policy and its Stationarity
 
 A **policy** in reinforcement learning is a strategy or function that defines the agent's actions at each state in an environment. Mathematically, a policy is often represented as \( \pi(a|s) \), where \( s \) is a state and \( a \) is an action. The policy \( \pi(a|s) \) gives the probability of taking action \( a \) when in state \( s \). 
 
-### Stationary Policy
+
 A **stationary policy** is one where the action probabilities depend only on the current state and remain constant over time. Formally, a stationary policy satisfies:
+
 \[
 \pi_t(a|s) = \pi(a|s) \quad \text{for all time steps} \, t
 \]
+
 This means the policy does not change as the environment evolves. This is common in many reinforcement learning settings where the dynamics of the problem do not change over time.
 
-### Non-Stationary Policy
+
 In contrast, a **non-stationary policy** is one where the action probabilities can change with time:
+
 \[
 \pi_t(a|s) \neq \pi_{t'}(a|s) \quad \text{for some} \, t \neq t'
 \]
+
 This occurs when the policy is adapted or modified based on external factors, such as learning or changes in the environment. A non-stationary policy is useful in situations where the environment or the agent's understanding of it evolves over time.
 
 
-## 2. Transition and Reward Dynamics
-
-### Transition Dynamics
+## Transition and Reward Dynamics
 
 The **transition dynamics** describe how the environment behaves when the agent takes an action in a given state. The transition function \( P(s' | s, a) \) specifies the probability of transitioning from state \( s \) to state \( s' \) when the agent takes action \( a \).
 
@@ -106,7 +80,6 @@ Where:
 - \( a_t \) is the action taken at time step \( t \),
 - \( s_{t+1} \) is the next state after taking action \( a_t \) from \( s_t \).
 
-#### Key Properties of Transition Dynamics:
 
 - **Stochastic Nature**: Transition dynamics are typically **stochastic**, meaning that taking the same action in the same state may result in different next states with some probability.
 - **Markov Property**: The system satisfies the **Markov Property**, meaning the next state depends only on the current state and action, not on the history of previous states or actions.
@@ -124,13 +97,41 @@ P(s' | (2, 2), \text{move left}) =
 
 This means that the agent always moves from \( (2, 2) \) to \( (1, 2) \) when taking the action "move left".
 
+
+The propability \( P(s' | s, a) \) is called the **transition function**, representing the probability of transitioning from state \( s \) to state \( s' \) after taking action \( a \). Since the dynamics \( P(s', r | s, a) \) gives the joint probability of the next state and reward, we can obtain the transition probability by summing over all possible rewards (called marginalising the reward):
+
+  $$
+    P(s' | s, a) = \sum_r P(s', r | s, a)
+  $$
+
+  This expresses the probability of transitioning to state \( s' \) given \( s \) and \( a \), regardless of the reward received.
+
+
+The **Markov Property** asserts that the future state depends only on the current state and action, not on any previous states or actions. This is a core assumption in MDPs and ensures that the system has **no memory** of past actions or states.
+
+Formally:
+
+\[
+P(s_{t+1} | s_t, a_t, \dots, s_0, a_0) = P(s_{t+1} | s_t, a_t)
+\]
+
+
+In many MDPs, the transition and reward functions are **stationary**, meaning that they do not change over time. This ensures that the transition probabilities and rewards are the same at every time step.
+
+Formally:
+
+\[
+P(s' | s, a) = P(s' | s, a) \quad \forall t
+\]
+
+
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=f93d3c1e-261f-42bd-93cd-92f67e120d99&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="Markov Decision Processes (MDP)" enablejsapi=1></iframe>
 
 
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=79d3a9ea-5401-4f3c-bcf2-5907255ef8da&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200"frameborder="0" scrolling="no" allowfullscreen title="2. Dynamics.mkv"></iframe>
 
 
-### Reward Dynamics
+## Reward Dynamics
 
 The **reward dynamics** define the reward that the agent receives when it takes an action in a given state and transitions to a new state. The reward function \( R(s, a, s') \) specifies the immediate reward when transitioning from state \( s \) to state \( s' \) after taking action \( a \).
 
@@ -145,31 +146,42 @@ Where:
 - \( s_t \) and \( a_t \) represent the state and action at time \( t \),
 - \( s_{t+1} \) is the resulting state at time \( t+1 \).
 
-#### Reward Function Properties:
+
 - **Immediate Reward**: \( R(s, a, s') \) gives the immediate reward for transitioning from state \( s \) to state \( s' \) after action \( a \).
 - **Stochastic Reward**: Rewards can be **stochastic**, meaning the same action in the same state can yield different rewards.
 
 Example:
-If the agent takes action \( a = \text{move right} \) from state \( s = (1, 1) \), the reward function might be:
+If the agent takes action \( a = \text{move right} \) from state \( s = (1, 1) \), the reward function might be: $R((1, 1), \text{move right}, (2, 1)) = 10$. Indicating that moving to the goal state \( (2, 1) \) yields a reward of 10. Conversely, if the agent moves to a dangerous state: $R((1, 1), \text{move left}, (0, 1)) = -5$. The agent receives a penalty of -5.
+
+
+The expected reward function \( R(s, a, s') \) can be derived from the joint transition-reward probability \( P(s', r | s, a) \) as follows:  
 
 \[
-R((1, 1), \text{move right}, (2, 1)) = 10
+R(s, a, s') = \sum_r r \cdot P(s', r | s, a)
 \]
 
-Indicating that moving to the goal state \( (2, 1) \) yields a reward of 10.
+This formula represents the expected reward received when transitioning to state \( s' \) from state \( s \) after taking action \( a \), by summing over all possible rewards weighted by their probabilities.
 
-Conversely, if the agent moves to a dangerous state:
+
+$$
+    R(s, a) = \sum_{s'} P(s' | s, a) R(s, a, s')
+$$
+
+  which represents the average reward expected when taking action \( a \) in state \( s \), considering all possible next states weighted by their transition probabilities.  
+  
+  From the above can you work out hwo to calculate  \( R(s, a) \)  from \( P(s', r | s, a) \). 
+
+The expected reward function \( R(s, a) \) can be computed from the joint transition-reward probability \( P(s', r | s, a) \) as follows:
+
 
 \[
-R((1, 1), \text{move left}, (0, 1)) = -5
+R(s, a) = \sum_{s'} \sum_r r \cdot P(s', r | s, a)
 \]
 
-The agent receives a penalty of -5.
+This formula represents the expected reward for taking action \( a \) in state \( s \), by summing over all possible next states \( s' \) and rewards \( r \), weighted by their probabilities.
 
 
-
-
-## 3. The Return $G_t$ of a time step $t$
+## The Return $G_t$ of a time step $t$
 We start by realising the 
 
 $$
@@ -262,7 +274,7 @@ If we want our agent to place more importance on earlier states, and near-starti
 When we want our agent to place more importance for the decisions near the terminal states, then a sparse reward is more convenient. Sparse rewards are also more suitable for offline learning as they simplify the learning and analysis of the agent's behaviour. Non-sparse rewards suit online learning on the other hand, because they give a quick indication of the agent behaviour suitability and hence speed up the early population of the value function. 
 
 
-## 4. The Expected Return Function V
+## The Expected Return Function V
 Once we move form an actul return that comes froma an actual experience at time step $t$ to try to estimate this return, we move to an expectaiton *function*. This function, traditionally called the value function v, is an important function. But now isntead of tying the value of the return to a particular experience at a step t which would be less useful in generalising the lessons an agent can learn from interacting with the environment, it makes more sense to ty this up to a certain state $s$. This will allow the agent to learn a useful expectation of the return(discounted sum of rewards) for a particualr state when the agent follows a policy $\pi$. I.e. we are now saying that a we will get an expected value of the return for a particular state under a policy $\pi$. So we moved from subscripting by a step $t$ into passing a state $s$ to the function and subscripting by a policy.
 
 
@@ -281,12 +293,13 @@ In the following video we tackle this idea in more details.
 
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=7b8178ed-68d1-4335-8ab7-3d81f214f362&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="475" height="200"frameborder="0" scrolling="no" allowfullscreen title="4. Returns Expectation and Sampling.mkv"></iframe>
 
+For algorithms like **Value Iteration**, it is important that the MDP is **irreducible** (all states are reachable from any other state) and **aperiodic** (there are no cycles of fixed lengths that prevent convergence).
 
-## 5. The Bellman Equations
+## The Bellman Equations
 
 The **Bellman equations** provide recursive relationships between the value of a state (or state-action pair) and the values of neighboring states. These equations are fundamental in solving MDPs and are the basis for many reinforcement learning algorithms.
 
-### Bellman Equation for the Value Function
+<!-- ### Bellman Equation for the Value Function -->
 
 The **value function** \( V_{\pi}(s) \) represents the expected return starting from state \( s \) and following policy \( \pi \). The Bellman equation for \( V_{\pi}(s) \) is:
 
@@ -300,7 +313,7 @@ Where:
 - \( \gamma \) is the discount factor, and
 - \( P(s' | s, a) \) is the transition probability.
 
-### Bellman Equation for the Q-Function
+<!-- ### Bellman Equation for the Q-Function -->
 
 The **Q-function** \( Q_{\pi}(s, a) \) represents the expected return after taking action \( a \) in state \( s \) and then following policy \( \pi \). The Bellman equation for \( Q_{\pi}(s, a) \) is:
 
@@ -321,13 +334,13 @@ Where:
 
 The **Bellman optimality equations** describe the relationship between the optimal value function \( V^*(s) \) or the optimal Q-function \( Q^*(s, a) \) and the transition and reward dynamics. These equations are used to compute the optimal policy that maximizes the expected return.
 
-#### Bellman Optimality Equation for the Value Function:
+<!-- #### Bellman Optimality Equation for the Value Function: -->
 
 \[
 V^*(s) = \max_a \mathbb{E}\left[ R(s, a, s') + \gamma \sum_{s'} P(s' | s, a) V^*(s') \right]
 \]
 
-#### Bellman Optimality Equation for the Q-Function:
+<!-- #### Bellman Optimality Equation for the Q-Function: -->
 
 \[
 Q^*(s, a) = \mathbb{E}\left[ R(s, a, s') + \gamma \sum_{s'} P(s' | s, a) \max_{a'} Q^*(s', a') \right]
@@ -349,9 +362,10 @@ You can adjust the video settings in SharePoint (speed up to 1.2 and reduce the 
 
 *Exercise 2*: Can you derive Bellman Optimality Equation for $q(s,a)$ from first principles?
 
-[video:  Bellman Optimality for q from first principles](https://leeds365-my.sharepoint.com/:v:/g/personal/scsaalt_leeds_ac_uk/EVBv-P5S4_VKqFt_E0vikIUBdpV1BZX2V-IDM3ROXDDV4A?e=YQQchV)
+% [video:  Bellman Optimality for q from first principles](https://leeds365-my.sharepoint.com/:v:/g/personal/scsaalt_leeds_ac_uk/EVBv-P5S4_VKqFt_E0vikIUBdpV1BZX2V-IDM3ROXDDV4A?e=YQQchV)
 
-
+ Bellman Optimality for q from first principles can be found in this *optional video*.
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=fef86f50-e352-4af5-a85b-7f134be29085&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. MDP Bellman Equation for q from first prinsiple.mkv"></iframe>
 
 ### Summary
 

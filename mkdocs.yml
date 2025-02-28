@@ -1,4 +1,4 @@
-site_name: Reinforcement Learning for Autonomous Agents-codespace
+site_name: Reinforcement Learning and Robotics
 site_author: Dr Abdulrahman Altahhan
 copyright: Copyright Abdulrahman Altahhan
 nav:
@@ -54,13 +54,14 @@ use_directory_urls: false
 
 theme:
   name: material
+  # logo: ../docs/img/logo.jpg
   custom_dir: overrides
   features:
     - navigation.tabs
     - navigation.sections
   font:
     text: Inter
-  favicon: ../docs/img/favicon.jpg
+  favicon: img/favicon.jpg
   # ../img/favicon.jpg
 
 plugins:
