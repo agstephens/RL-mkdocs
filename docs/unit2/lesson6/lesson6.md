@@ -150,27 +150,6 @@ MC = MC1st(MRP)
 to make sure that we are dealing with latest MRP definition.
 
 
-```python
-mc = MC1st(episodes=10, plotE=True).interact()
-```
-
-
-    
-![png](output_42_0.png)
-    
-
-
-
-```python
-mc = MC1st(episodes=10, plotV=True).interact()
-```
-
-
-    
-![png](output_43_0.png)
-    
-
-
 Ok one more thing, to avoid passing the value of plotE=True, plotV=True, animate=True, whenever we want to demo a prediction algorithm, we can create a dictionary and store these values in it and then pass the reference to the MC1st call, below we show how.
 
 
@@ -182,7 +161,6 @@ demoV = {'plotE':True, 'plotV':True, 'animate':True} # suitable for prediction
 ```python
 mc = MC1st(episodes=100, **demoV, seed=1).interact()
 ```
-
 
     
 ![png](output_46_0.png)
@@ -244,7 +222,7 @@ class MC1stControl(MDP()):
 Similar to what we did for prediction, we get help from a dictionary that stores a set of useful configurations that we use often. In the case of control, the most useful is plotting the number of steps the agent took to reach a terminal state in each episode or the sum of rewards the agent collected in each episode. Each one of these plots can be useful for certain tasks. Bear in mind that if the reward is given only for reaching the goal location or terminal state, the sum of the rewards plot would be a constant line that does not convey useful information. Below we show each.
 
 
-Unfortunately, applying the MC control algorithm with the default reward function will not yield a useful policy. This is because the explore-start condition is not satisfied (refer to section 5.4 of our book). In addition, averaging solutions may not perform well because they do not track a changing policy well for non-stationary problems (most of the control problems are non-stationary). To see this, uncomment the lines in the cell below and run it. (Note that we have set up the priorities of the actions in a way that will show this issue (right comes before left and down before up)
+Unfortunately, applying the MC control algorithm with the default reward function will not yield a useful policy. This is because the explore-start condition is not satisfied (refer to section 5.4 of our book). In addition, averaging solutions may not perform well because they do not track a changing policy well for non-stationary problems (most of the control problems are non-stationary). To see this, uncomment the lines in the cell below and run it. (Note that we have set up the priorities of the actions in a way that will show this issue (right comes before left and down before up). demoQ is a dicitonary that passes visualisaiton values to the MDP control algorithm.
 
 
 ```python
