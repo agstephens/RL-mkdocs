@@ -134,10 +134,10 @@ We have provided you with two [RL libraries](/RLlibrary.zip){:download="RLlibrar
 <!-- general -->
 ```
 !pip install --upgrade pip
-!pip3 install opencv-python
-!pip3 install scikit-learn
+!pip install opencv-python
+!pip install scikit-learn
 !pip install matplotlib
-!pip3 install tqdm
+!pip install tqdm 
 ```
 
 <!-- Better Readability -->
