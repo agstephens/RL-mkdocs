@@ -65,18 +65,8 @@ TDwalk.interact(label='TD learning')
 ```
 ![png](output_13_1.png)
     
-
 Note that we did not need to store the episodes trajectories in a pure online method, hence these methods are usually more memory efficient that there offline counterpart!
 Note how TD performed far better and converged faster in fewer episodes than MC
-
-Of course we can call interact immediately  as follows.
-
-
-```python
-TDwalk = TD(episodes=100, v0=.5, **demoV()).interact(label='TD learning')
-```
-![png](output_17_0.png)
-    
 
 
 ### Offline TD
@@ -116,7 +106,7 @@ We could have also made the algorithm go backwards, similar to MC. Each has its 
 
 ## Conducting trials(several runs) of experiments
 
-Let us now use a useful handy class called 'run' that summarises several runs for us to reach a reliable and unbiased conclusions when we compare algorithms performances.
+Let us now use a useful handy class called 'Runs' that summarises several runs for us to reach a reliable and unbiased conclusions when we compare algorithms performances.
 
 Note that the class allows us to run several experiments efficiently. The main assumption is that the algorithms are inherited from an MRP class which applies for the majority of the classes that we will deal with in our units.
 
@@ -284,13 +274,12 @@ figure_6_2()
     
 
 
-## TD Control 
-In this section, we deal with TD control. We cover mainly two algorithms one is Sarsa which is an on-policy control algorithm (meaning the followed policy is the same as the policy we are learning about). The second main algorithm is the famous Q-learning algorithm which is an off-policy algorithm. In the case of Q-learning, the agent is acting according to an ε-greedy algorithm while it is learning about a greedy algorithm.
+## Sarsa on-policy control (using TD Update for Control)
+In this section, we deal with TD updates to achieve control. 
+**Using the previously shown TD algorithm directly is not suitable for control, we must adapt it so that it changes the Q tabel not the V table.**
+We cover mainly two algorithms one is Sarsa which is an on-policy control algorithm (meaning the followed policy is the same as the policy we are learning about). The second main algorithm is the famous Q-learning algorithm which is an off-policy algorithm. In the case of Q-learning, the agent is acting according to an ε-greedy algorithm while it is learning about a greedy algorithm.
 
 Similar to what we did earlier we will use the two dictionaries demoQ and demoR to make the calls more concise.
-
-## Sarsa on-policy control
-
 
 ```python
 class Sarsa(MDP()):
@@ -306,35 +295,12 @@ class Sarsa(MDP()):
 Note that we do not store the experience for this one-step online algorithm while we had to for MC, and this is again one of the advantages of online methods.
 
 Let us now apply the Sarsa on a simple grid world environment. The goal is directly facing the start position. However, to make the problem more difficult for the algorithm we have deprioritised the right action and we place the order of the actions as follows: left, right, down and up. This simple change made the agent pick going left before going right and made the problem only a bit more difficult. Let us see how the Sarsa performs on it.
-
-
-```python
-env2x3 = Grid(gridsize=[2, 3], reward='reward_', s0=0, goals=[5], figsize=[10,1])
-```
-
-```python
-sarsa = Sarsa(env=env2x3, α=.1, γ=.9, episodes=10, store=True, seed=0, **demoQ())
-sarsa.interact()
-```
-    
-![png](output_49_1.png)
     
 
 ```python
 sarsa = Sarsa(env=grid(), α=.8, episodes=50, seed=10, **demoQ()).interact()
-```
-
-
-    
+```    
 ![png](output_52_0.png)
-    
-
-
-
-```python
-%time sarsa = Sarsa(env=grid(reward='reward_1'), q0=10, ε=.4, α=.3, episodes=20000, seed=1, **demoQ()).interact()
-```
-![png](output_53_1.png)
     
 
 ```python
@@ -343,11 +309,11 @@ mc = MCC(env=grid(reward='reward100'), α=.3, episodes=20, seed=1, **demoQ()).in
 ![png](output_55_0.png)
     
 
-Note how Sarsa performed better and converged faster in fewer episodes than MCC
+Note how Sarsa performed better and converged faster in fewer episodes than MCC although it did cover the full environment.
 
 ```python
-%time sarsa = Sarsa(env=grid(reward='reward100'),  α=.3, episodes=20, seed=1, plotT=True).interact(label='Sarsa')
-%time mc = MCC(env=grid(reward='reward100'), α=.3, episodes=20, seed=1, plotT=True).interact(label='MCControl')
+sarsa = Sarsa(env=grid(reward='reward100'), α=.3, episodes=20, seed=1, plotT=True).interact(label='Sarsa')
+mcc   = MCC  (env=grid(reward='reward100'), α=.3, episodes=20, seed=1, plotT=True).interact(label='MCControl')
 ```
     
 ![png](output_57_1.png)
@@ -355,54 +321,11 @@ Note how Sarsa performed better and converged faster in fewer episodes than MCC
 
 Of course we change the seed the performance will change for both. Also if we change the learning rate α the performance will vary (change the seed to 0 and run). This is why it is important to conduct several runs in order to obtain the performance of the algorithms on average.
 
-
-```python
-def Maze(rows=6, cols=9, **kw):
-    return Grid(gridsize=[rows,cols], s0=int((rows)/2)*cols, goals=[rows*cols-1], style='maze', **kw)
-
-def maze_large(**kw):
-    return Maze(rows=16, cols=26, figsize=[25,4],**kw)
-```
-
-
 ```python
 sarsa_large = Sarsa(env=maze_large(), α=.1, episodes=500, seed=0 , **demoQ()).interact()
-```
-
-
-    
+``` 
 ![png](output_60_0.png)
-    
 
-
-### Changing actions priorities
-
-To change the action priority we can do the following:
-
-
-```python
-env = grid(reward='reward100')
-env._right, env._left, env._up , env._down=tuple(range(0,4))
-sarsa = Sarsa(env=env, episodes=20, seed=10, **demoQ()).interact()
-```
-
-
-    
-![png](output_63_0.png)
-    
-
-
-Note how the new dynamics made the solution a bit easier. This makes more difference specifically for the MCC because it depends on explore-start.
-
-
-```python
-mc = MCC(env=env, α=.2, episodes=50, **demoQ()).interact()
-```
-
-
-    
-![png](output_65_0.png)
-    
 
 
 ## Sarsa on windy environment
@@ -447,23 +370,9 @@ As you can see, we did not use the action *an* in Qlearning() because we take th
 
 ```python
 qlearn = Qlearn(env=grid(), γ=1, α=.8, episodes=40, seed=10, **demoQ()).interact()
-```
-
-
-    
+```    
 ![png](output_71_0.png)
-    
-
-
-
-```python
-qlearn = Qlearn(env=grid(reward='reward1'), α=.8, episodes=40, seed=10, **demoQ()).interact()
-```
-
-
-    
-![png](output_72_0.png)
-    
+ 
 
 
 ## Sarsa and Q-Learning on a Cliff Edge!
@@ -508,21 +417,10 @@ def Sarsa_Qlearn_cliffwalk(runs=200, α=.5, env=cliffwalk(), alg1=Sarsa, alg2=Ql
 def example_6_6(**kw): return Sarsa_Qlearn_cliffwalk(**kw)
 ```
 
-
 ```python
 SarsaCliff, QlearnCliff = Sarsa_Qlearn_cliffwalk()
-```
-
-    
+```    
 ![png](output_78_1.png)
-
-
-```python
-sarsa = Sarsa(env=maze(reward='reward1'), episodes=20, seed=10, **demoQ()).interact()
-```
-    
-![png](output_79_0.png)
-    
 
 
 ## Expected Sarsa
@@ -628,28 +526,16 @@ def compareonMaze(runs=100, α=.5):
 
 ```python
 SarsaMaze, XSarsaMaze, QlearnMaze, DQlearnMaze = compareonMaze(α=.5)
-```
-    
+``` 
 ![png](output_93_2.png)
 
-
-
-```python
-SarsaMaze, XSarsaMaze, QlearnMaze, DQlearnMaze = compareonMaze(α=.7)
-```
-    
-![png](output_94_0.png)
-
-    
-![png](output_94_2.png)
-    
 
 
 ## Actor-Critic: TD for Policy Gradient Methods
 Earlier, we saw how REINFORCE could perform well in the grid environment. REINFORCE is a policy gradient method that attempts to directly estimate a policy instead of estimating an action-value function. This is done by using the value function as an objective function that we would want to *maximise* (instead of minimising an error function as in Sarsa or Q-learning).
 
 Like Monte Carlo, REINFORCE is an offline method that needs to wait until the end of an episode to estimate the value function. The question, then, is there an algorithm similar to REINFORCE but online? The method should be derived similarly to Sarsa and Q-learning, which depends on the next step estimate of the value function.
-The answer is yes, and the method is called Actor-critic, which does that exactly. The algorithm general unified update attempts to estimate its policy by directly *maximising the returns with respect to a baseline* (see section 13.4). When the algorithm replaces its returns with an estimate of the returns (section 13.5, the difference between the return estimate and the baseline becomes a TD error), the algorithm can be thought of as having two distinctive parts an actor and a critic. The actor maximises its *start-state-value function*, while the critic attempts to improve its *estimates* of the *state-value function* for all states. Both of them use the Temporal Difference (TD) error to improve their estimates, meaning they can work online. Like REINFORCE, the actor-critic uses a SoftMax policy to select an action according to the actor policy parameters. So, to maximise the value, the actor takes the derivative of the $ \nabla \log v(S_0)$. 
+The answer is yes, and the method is called Actor-critic, which does that exactly. The algorithm general unified update attempts to estimate its policy by directly *maximising the returns with respect to a baseline* (see section 13.4). When the algorithm replaces its returns with an estimate of the returns (section 13.5, the difference between the return estimate and the baseline becomes a TD error), the algorithm can be thought of as having two distinctive parts an actor and a critic. The actor maximises its *start-state-value function*, while the critic attempts to improve its *estimates* of the *state-value function* for all states. Both of them use the Temporal Difference (TD) error to improve their estimates, meaning they can work online. Like REINFORCE, the actor-critic uses a SoftMax policy to select an action according to the actor policy parameters. So, to maximise the value, the actor takes the derivative of the $\nabla \log v(S_0)$. 
 
 Actor-critic is one of the oldest RL algorithms, and it avoids several issues that arise from the use of $\epsilon$-greedy policy. The most obvious one is that the policy changes the *probability* of selecting an action gradually and continuously when the parameters change, unlike $\epsilon$-greedy, which can change the *maximum value action* abruptly due to a small change in the parameters. This also allows it to provide better convergence guarantees.
 
@@ -670,45 +556,15 @@ class Actor_Critic(PG()):
 ```
 
 ### Delayed Reward
-First let us establish the baseline performance
-
-
-```python
-ac = Actor_Critic(env=grid(), α=1, τ=1, γ=1, episodes=100, seed=0 , **demoQ()).interact()
-```
-
-
-    
-![png](output_98_0.png)
-    
-
-
-Note that we set α=1 which is unusual for an RL algorithm and the method just worked. This is a testimony to the resilience and strength of actor-critic methods. Let us test this further.
-
+First let us establish the baseline performance.
 
 ```python
 ac = Actor_Critic(env=grid(), α=1, τ=.3, γ=1, episodes=100, seed=0 , **demoQ()).interact()
-```
-
-
-    
+```    
 ![png](output_100_0.png)
     
+Note that we set α=1 which is unusual for an RL algorithm and the method just worked. This is a testimony to the resilience and strength of actor-critic methods. Note how reducing the exploration factor $\tau=.3$ led to a much faster convergence.
 
-
-Note how reducing the exploration factor $\tau=.3$ led to a much faster convergence.
-
-Let us now reduce the learning rate instead.
-
-
-```python
-ac = Actor_Critic(env=grid(), α=.1, τ=1, γ=1, episodes=500, seed=0, **demoQ()).interact()
-```
-
-
-    
-![png](output_103_0.png)
-    
 
 
 Note how we had to increase the number of episodes to converge when we set $\alpha=.1$ instead of $\alpha=1$.
@@ -716,183 +572,35 @@ Note how we had to increase the number of episodes to converge when we set $\alp
 
 ```python
 ac = Actor_Critic(env=grid(), α=.1, τ=.1, γ=1, episodes=100, seed=0, **demoQ()).interact()
-```
-
-
-    
+``` 
 ![png](output_105_0.png)
     
 
 
 Note how reducing both $\tau$ and $\alpha$ helped reach convergence quickly but with a better exploration.
 
-Let us now reduce the discount factor $\gamma$
-
-
-```python
-ac = Actor_Critic(env=grid(), α=1, τ=1, γ=.99, episodes=100, seed=0, **demoQ()).interact()
-```
-
-
-    
-![png](output_108_0.png)
-    
-
-
-
-```python
-ac = Actor_Critic(env=grid(), α=1, τ=.97, γ=.99, episodes=100, seed=0, **demoQ()).interact()
-```
-
-
-    
-![png](output_109_0.png)
-    
-
-
-
-```python
-ac = Actor_Critic(env=grid(), α=.3, τ=1, γ=.99, episodes=100, seed=0, **demoQ()).interact()
-```
-
-
-    
-![png](output_110_0.png)
-    
-
-
-
-```python
-ac = Actor_Critic(env=grid(), α=.8, τ=.9, γ=.99, episodes=100, seed=0, **demoQ()).interact()
-```
-
-
-    
-![png](output_111_0.png)
-    
-
-
-print(ac.Q)
 
 ### Intermediate Reward
-
-
-```python
-ac = Actor_Critic(env=grid(reward='reward0'), α=1, τ=1, γ=1, episodes=100, seed=0 , **demoQ()).interact()
-```
-
-
-    
-![png](output_114_0.png)
-    
-
-
-
-```python
-ac = Actor_Critic(env=grid(reward='reward0'), α=1, τ=.9, γ=1, episodes=100, seed=0 , **demoQ()).interact()
-```
-
-
-    
-![png](output_115_0.png)
-    
-
-
 
 ```python
 ac = Actor_Critic(env=grid(reward='reward0'), α=.7, τ=1, γ=.98, episodes=100, seed=0 , **demoQ()).interact()
 ```
-
-
-    
 ![png](output_116_0.png)
-    
-
-
-
-```python
-ac = Actor_Critic(env=grid(reward='reward0'), α=.1, τ=1, γ=1, episodes=100, seed=0 , **demoQ()).interact()
-```
-
-
-    
-![png](output_117_0.png)
-    
-
-
-
-```python
-ac = Actor_Critic(env=grid(reward='reward0'), α=.1, τ=.3, γ=1, episodes=100, seed=0 , **demoQ()).interact()
-```
-
-
-    
-![png](output_118_0.png)
-    
-
-
-
-```python
-ac = Actor_Critic(env=grid(reward='reward0'), α=.1, τ=.3, γ=.99, episodes=100, seed=0 , **demoQ()).interact()
-```
-
-
-    
-![png](output_119_0.png)
-    
+        
 
 
 
 ```python
 ac = Actor_Critic(env=maze(reward='reward0'), α=.1, τ=1,  γ=1, episodes=100, seed=0 , **demoQ()).interact()
-```
-
-
-    
+```  
 ![png](output_120_0.png)
     
-
-
-
-```python
-ac = Actor_Critic(env=maze(reward='reward0'), α=.1, τ=1,  γ=1, episodes=100, seed=0 , **demoQ()).interact()
-```
-
-
-    
-![png](output_121_0.png)
-    
-
-
-
-```python
-ac = Actor_Critic(env=maze(), α=.1, τ=1,  γ=1,episodes=100, seed=0 , **demoQ()).interact()
-```
-
-
-    
-![png](output_122_0.png)
-    
-
-
-
-```python
-ac_large = Actor_Critic(env=maze_large(), α=.1, τ=1,  γ=1,episodes=500, seed=0 , **demoQ()).interact()
-```
-
-
-    
-![png](output_123_0.png)
-    
-
 
 
 ```python
 ac_large = Actor_Critic(env=maze_large(), α=.1, τ=.3, γ=1, episodes=500, seed=0 , **demoQ()).interact()
 ```
-
-
-    
+ 
 ![png](output_124_0.png)
     
 
