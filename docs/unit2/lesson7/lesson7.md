@@ -256,10 +256,10 @@ Vision is possibly the most valuable sense humans have. Studies by Harvard psych
 
 
 ## Your turn:
-Run the following worksheet to understand how ros works.
-  [worksheet8.1](../../workseets/worksheet8.1.ipynb)
+Follow [Worksheet7](worksheet7.md) to understand how to deal with ros2 programatically.
+  <!-- [worksheet8.1](../../workseets/worksheet8.1.ipynb)
 
-  [worksheet8.2](../../workseets/worksheet8.2.ipynb)
+  [worksheet8.2](../../workseets/worksheet8.2.ipynb) -->
 
 
 # Unit's conclusion

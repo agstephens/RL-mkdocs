@@ -138,7 +138,7 @@ The **reward dynamics** define the reward that the agent receives when it takes 
 Formally, the reward function is expressed as:
 
 \[
-R(s, a, s') = \mathbb{E}[r_{t+1} | s_t = s, a_t = a, s_{t+1} = s']
+    R(s, a, s') = \mathbb{E}[r_{t+1} | s_t = s, a_t = a, s_{t+1} = s']
 \]
 
 Where:
@@ -205,7 +205,7 @@ In the video below we talk more about this important concept.
 
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=e5a9acea-f258-4952-8e05-46f5ffb0c576&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="3. Returns 1"></iframe>
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=8a1a8b63-58be-45ce-86b1-eedb4bc133c4&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200"frameborder="0" scrolling="no" allowfullscreen title="3. Returns 2"></iframe>
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=8a1a8b63-58be-45ce-86b1-eedb4bc133c4&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="3. Returns 2"></iframe>
 
 
 
@@ -334,16 +334,15 @@ Where:
 
 The **Bellman optimality equations** describe the relationship between the optimal value function \( V^*(s) \) or the optimal Q-function \( Q^*(s, a) \) and the transition and reward dynamics. These equations are used to compute the optimal policy that maximizes the expected return.
 
-<!-- #### Bellman Optimality Equation for the Value Function: -->
+
 
 \[
-V^*(s) = \max_a \mathbb{E}\left[ R(s, a, s') + \gamma \sum_{s'} P(s' | s, a) V^*(s') \right]
+    V^*(s) = \max_a \mathbb{E}\left[ R(s, a, s') + \gamma \sum_{s'} P(s' | s, a) V^*(s') \right]
 \]
 
-<!-- #### Bellman Optimality Equation for the Q-Function: -->
 
 \[
-Q^*(s, a) = \mathbb{E}\left[ R(s, a, s') + \gamma \sum_{s'} P(s' | s, a) \max_{a'} Q^*(s', a') \right]
+    Q^*(s, a) = \mathbb{E}\left[ R(s, a, s') + \gamma \sum_{s'} P(s' | s, a) \max_{a'} Q^*(s', a') \right]
 \]
 
 Where:
@@ -362,10 +361,19 @@ You can adjust the video settings in SharePoint (speed up to 1.2 and reduce the 
 
 *Exercise 2*: Can you derive Bellman Optimality Equation for $q(s,a)$ from first principles?
 
-% [video:  Bellman Optimality for q from first principles](https://leeds365-my.sharepoint.com/:v:/g/personal/scsaalt_leeds_ac_uk/EVBv-P5S4_VKqFt_E0vikIUBdpV1BZX2V-IDM3ROXDDV4A?e=YQQchV)
 
  Bellman Optimality for q from first principles can be found in this *optional video*.
+
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=fef86f50-e352-4af5-a85b-7f134be29085&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. MDP Bellman Equation for q from first prinsiple.mkv"></iframe>
+
+
+## Grid World Environments
+
+Ok, so now we are ready to tackle the practicals, please go ahead and download the worksheet and run and experiement with the provided code to build some grid world environments and visualise them and make a simple robot agent takes some steps/actions within these environments!.
+
+You will need to download a python library (Grid.py) that we bespokley developed to help you run RL algorithms on toy problems and be abel to easily visualise them as needed, the code is optimised to run efficiently and you will be able to use these environmnets to test different RL algorithms extensively. Please place the library in the same directory of the worksheet. In general it would be a good idea to place all worksheets and libraries provided in one directory. This will make importing and runing code easier and more streamlined.
+
+
 
 ### Summary
 
@@ -377,8 +385,4 @@ For further info refer to chapter 3 of the Sutton and Barto [book](http://incomp
 
 
 ## Your turn
-Go ahead and play around with some grid world environment by executing and experiementing with the code in the following worksheet.
-
-<!-- <a href="Grid.py" download> Grid world library</a> -->
-
-[worksheet3](../../workseets/worksheet3.ipynb)
+Go ahead and play around with some grid world environment by executing and experiementing with the code in [worksheet3](../../workseets/worksheet3.ipynb).
