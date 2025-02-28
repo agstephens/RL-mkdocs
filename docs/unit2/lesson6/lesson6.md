@@ -1,8 +1,3 @@
-Author: Abdulrahman Altahhan, 2024.
-
-The notebook uses a library of functionality in RL that aims for simplicity and general insight into how algorithms work, these libraries are written from scratch using standard Python libraries (numpy, matplotlib etc.).
-Please note that you will need permission from the author to use the code for research, commercially or otherwise.
-
 # Lesson 5-Tabular Methods: Monte Carlo
 
 **Learning outcomes**
@@ -13,10 +8,6 @@ Please note that you will need permission from the author to use the code for re
 1. understand the implication of satisfying and not satisfying the explore-start requirement for the MC control and how to mitigate it via the reward function
 1. understand how to move from prediction to control by extending the V function to a Q function and make use of the idea of generalised policy iteration-GPI
 1. understand how policy gradient methods work and appreciate how they differ from value function methods
-
-
-<!-- **Reading**:
-The accompanying reading of this lesson is **chapter 5** from our textbook by Sutton and Barto available online [here](http://incompleteideas.net/book/RLbook2020.pdf). Please note that we explain the ideas of this topic from a practical perspective and not from a theoretical perspective, which is already covered in the textbook. Please note that off-policy methods are not covered and hence can be skipped safely when reading from the textbook. -->
 
 
 In this lesson, we develop the ideas of Monte Carlo methods. Monte Carlo methods are powerful and widely used in settings other than RL. You may have encountered them in a previous module where they were mainly used for sampling. We will also use them here to sample observations and average their expected returns. Because they average the returns, Monte Carlo methods have to wait until *all* trajectories are available to estimate the return. Later, we will find out that Temporal Difference methods do not wait until the end of the episode to update their estimate and outperform MC methods.
