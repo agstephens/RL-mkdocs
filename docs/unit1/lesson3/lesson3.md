@@ -1,5 +1,3 @@
-Author: Abdulrahman Altahhan, 2025.
-
 <script>
   window.MathJax = {
     tex: {
@@ -9,37 +7,169 @@ Author: Abdulrahman Altahhan, 2025.
   };
 </script>
 
+# Lesson 3- Markov Decision Processes, Dynamics and Bellman Equaitons
 
-# Lesson 3- Markov Decision Processes and value functions
-
-In this lesson we cover various grid world environments that are tackled as examples in the accompanying text book available online [here](http://incompleteideas.net/book/RLbook2020.pdf). Please note that we explain the ideas of this topic from a practical perspective and not from a theoretical perspective which is already covered in the textbook.
 
 **Learning outcomes**
 
 1. understand MDP and its elements
-1. understand the return for a time step $t$
-1. understand the expected return of a state $s$
-1. understand the Bellman optimality equations
-1. become familiar with the different types of grid world problems that we will tackle in later units
-1. become familiar with the way we assign a reward to an environment
+2. understand the return for a time step $t$
+3. understand the expected return of a state $s$
+4. understand the Bellman optimality equations
+5. become familiar with the different types of grid world problems
+<!-- 6. become familiar with the way we assign a reward to an environment
 1. be able to execute actions in a grid world and observe the result
-1. be able to to visualise a policy and its action-value function
+2. be able to to visualise a policy and its action-value function -->
 
-**Reading**:
-The accompanying reading of this lesson is **chapter 3** from our text book by Sutton and Barto available online [here](http://incompleteideas.net/book/RLbook2020.pdf). 
+## 1. Markov Decision Process (MDP)
+
+A **Markov Decision Process (MDP)** provides a mathematical framework to model decision-making problems where an agent interacts with an environment. It is characterized by a tuple \( (S, A, P, R, \gamma) \) where:
+
+- \( S \) is the set of states in the environment.
+- \( A \) is the set of actions available to the agent.
+- \( P(s' | s, a) \) is the **transition function**, representing the probability of transitioning from state \( s \) to state \( s' \) after taking action \( a \).
+- \( R(s, a, s') \) is the **reward function**, representing the immediate reward received when transitioning from state \( s \) to state \( s' \) after taking action \( a \).
+- \( \gamma \) is the **discount factor**, a value between 0 and 1 that determines the importance of future rewards relative to immediate rewards.
+
+The MDP framework is central to reinforcement learning (RL), as it allows the agent to plan and optimize its actions over time to maximize the expected return.
 
 
+### Markov Property
 
-To help you, Abdulrahman recorded a set of videos that covers important concepts of RL.
+The **Markov Property** asserts that the future state depends only on the current state and action, not on any previous states or actions. This is a core assumption in MDPs and ensures that the system has **no memory** of past actions or states.
 
-## Markov Decision Processes (MDP)
+Formally:
+
+\[
+P(s_{t+1} | s_t, a_t, \dots, s_0, a_0) = P(s_{t+1} | s_t, a_t)
+\]
+
+### Stationarity
+
+In many MDPs, the transition and reward functions are **stationary**, meaning that they do not change over time. This ensures that the transition probabilities and rewards are the same at every time step.
+
+Formally:
+
+\[
+P(s' | s, a) = P(s' | s, a) \quad \forall t
+\]
+
+### Deterministic vs. Stochastic Dynamics
+
+- **Deterministic Dynamics**: If the transition function \( P(s' | s, a) \) always produces the same next state, the system is deterministic.
+- **Stochastic Dynamics**: If \( P(s' | s, a) \) is probabilistic, the system is stochastic.
+
+### Reward Structure
+
+The **reward function** \( R(s, a, s') \) can either be **deterministic** (fixed reward) or **stochastic** (random reward). The structure of the rewards influences the agent's behavior and learning.
+
+### Irreducibility and Aperiodicity
+
+For algorithms like **Value Iteration**, it is important that the MDP is **irreducible** (all states are reachable from any other state) and **aperiodic** (there are no cycles of fixed lengths that prevent convergence).
+
+---
+
+
+## 2. Policy and its Stationarity
+
+A **policy** in reinforcement learning is a strategy or function that defines the agent's actions at each state in an environment. Mathematically, a policy is often represented as \( \pi(a|s) \), where \( s \) is a state and \( a \) is an action. The policy \( \pi(a|s) \) gives the probability of taking action \( a \) when in state \( s \). 
+
+### Stationary Policy
+A **stationary policy** is one where the action probabilities depend only on the current state and remain constant over time. Formally, a stationary policy satisfies:
+\[
+\pi_t(a|s) = \pi(a|s) \quad \text{for all time steps} \, t
+\]
+This means the policy does not change as the environment evolves. This is common in many reinforcement learning settings where the dynamics of the problem do not change over time.
+
+### Non-Stationary Policy
+In contrast, a **non-stationary policy** is one where the action probabilities can change with time:
+\[
+\pi_t(a|s) \neq \pi_{t'}(a|s) \quad \text{for some} \, t \neq t'
+\]
+This occurs when the policy is adapted or modified based on external factors, such as learning or changes in the environment. A non-stationary policy is useful in situations where the environment or the agent's understanding of it evolves over time.
+
+
+## 2. Transition and Reward Dynamics
+
+### Transition Dynamics
+
+The **transition dynamics** describe how the environment behaves when the agent takes an action in a given state. The transition function \( P(s' | s, a) \) specifies the probability of transitioning from state \( s \) to state \( s' \) when the agent takes action \( a \).
+
+Formally, the transition function is expressed as:
+
+\[
+P(s' | s, a) = \mathbb{P}(s_{t+1} = s' | s_t = s, a_t = a)
+\]
+
+Where:
+- \( s_t \) is the state at time step \( t \),
+- \( a_t \) is the action taken at time step \( t \),
+- \( s_{t+1} \) is the next state after taking action \( a_t \) from \( s_t \).
+
+#### Key Properties of Transition Dynamics:
+
+- **Stochastic Nature**: Transition dynamics are typically **stochastic**, meaning that taking the same action in the same state may result in different next states with some probability.
+- **Markov Property**: The system satisfies the **Markov Property**, meaning the next state depends only on the current state and action, not on the history of previous states or actions.
+
+Example:
+In a grid world, if the agent is at state \( s = (2, 2) \) and takes action \( a = \text{move left} \), the transition probability might be deterministic:
+
+\[
+P(s' | (2, 2), \text{move left}) = 
+\begin{cases} 
+1 & \text{if } s' = (1, 2) \\
+0 & \text{otherwise}
+\end{cases}
+\]
+
+This means that the agent always moves from \( (2, 2) \) to \( (1, 2) \) when taking the action "move left".
 
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=f93d3c1e-261f-42bd-93cd-92f67e120d99&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="Markov Decision Processes (MDP)" enablejsapi=1></iframe>
 
 
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=79d3a9ea-5401-4f3c-bcf2-5907255ef8da&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200"frameborder="0" scrolling="no" allowfullscreen title="2. Dynamics.mkv"></iframe>
 
-## The Return $G_t$ of a time step $t$
+
+### Reward Dynamics
+
+The **reward dynamics** define the reward that the agent receives when it takes an action in a given state and transitions to a new state. The reward function \( R(s, a, s') \) specifies the immediate reward when transitioning from state \( s \) to state \( s' \) after taking action \( a \).
+
+Formally, the reward function is expressed as:
+
+\[
+R(s, a, s') = \mathbb{E}[r_{t+1} | s_t = s, a_t = a, s_{t+1} = s']
+\]
+
+Where:
+- \( r_{t+1} \) is the reward received at time step \( t+1 \),
+- \( s_t \) and \( a_t \) represent the state and action at time \( t \),
+- \( s_{t+1} \) is the resulting state at time \( t+1 \).
+
+#### Reward Function Properties:
+- **Immediate Reward**: \( R(s, a, s') \) gives the immediate reward for transitioning from state \( s \) to state \( s' \) after action \( a \).
+- **Stochastic Reward**: Rewards can be **stochastic**, meaning the same action in the same state can yield different rewards.
+
+Example:
+If the agent takes action \( a = \text{move right} \) from state \( s = (1, 1) \), the reward function might be:
+
+\[
+R((1, 1), \text{move right}, (2, 1)) = 10
+\]
+
+Indicating that moving to the goal state \( (2, 1) \) yields a reward of 10.
+
+Conversely, if the agent moves to a dangerous state:
+
+\[
+R((1, 1), \text{move left}, (0, 1)) = -5
+\]
+
+The agent receives a penalty of -5.
+
+
+
+
+## 2. The Return $G_t$ of a time step $t$
 We start by realising the 
 
 $$
@@ -57,7 +187,7 @@ $$
 \end{equation}
 $$
 
-**The above equation is the most important equation that we will build all of our incremental updates in RL on it.**
+**The above equation is the most important equation in RL that the Bellman Equations are built on it. In turn, we build all of our incremental updates in RL on Bellman optimality equation**
 
 In the video below we talk more about this important concept.
 
@@ -98,23 +228,6 @@ The inequality $\frac{R_{t+1}}{1 - \gamma} >  G_{t+1}$ (which also can be writte
 Now when $R_{t+1}=1$ and $\gamma=.9$, then by substituting these values in the inequality, we get that
 $\frac{1}{1 - .9} >  G_{t+1} \implies$ $10 > G_{t+1}$ 
 
-We provided you with a simple code to in the worksheet below to demosntrate how the G changes with time steps.
-
-```python
-G = 0
-R = 1
-γ = 0.9
-T = 100
-for t in range(T,0,-1):
-    if t> 70: print('G_',t,'=',round(G,3))
-    G = R + γ*G 
-```
-    G_ 100 = 0
-    G_ 99 = 1.0
-    G_ 98 = 1.9
-    G_ 97 = 2.71
-    G_ 96 = 3.439
-    ...
 
 ### $G_t$ Monotonicity for Sparse MDP Rewards
 
@@ -149,23 +262,7 @@ If we want our agent to place more importance on earlier states, and near-starti
 When we want our agent to place more importance for the decisions near the terminal states, then a sparse reward is more convenient. Sparse rewards are also more suitable for offline learning as they simplify the learning and analysis of the agent's behaviour. Non-sparse rewards suit online learning on the other hand, because they give a quick indication of the agent behaviour suitability and hence speed up the early population of the value function. 
 
 
-
-```python
-G = 0
-γ = 0.9 # change to 1 to see the effect
-T = 100
-for t in range(T,1,-1): # note that if we use a forward loop, our calculations will be all wrong although the code runs
-    if t>70: print('G_',t,'=',round(G,2), round(γ**(T-t-1),2) if t<T else 0)
-    R=1 if t==T else 0
-    G = R + γ*G
-```
-    G_ 100 = 0 0
-    G_ 99 = 1.0 1.0
-    G_ 98 = 0.9 0.9
-    G_ 97 = 0.81 0.81
-    ...
-
-## The Expected Return Function V
+## 2. The Expected Return Function V
 Once we move form an actul return that comes froma an actual experience at time step $t$ to try to estimate this return, we move to an expectaiton *function*. This function, traditionally called the value function v, is an important function. But now isntead of tying the value of the return to a particular experience at a step t which would be less useful in generalising the lessons an agent can learn from interacting with the environment, it makes more sense to ty this up to a certain state $s$. This will allow the agent to learn a useful expectation of the return(discounted sum of rewards) for a particualr state when the agent follows a policy $\pi$. I.e. we are now saying that a we will get an expected value of the return for a particular state under a policy $\pi$. So we moved from subscripting by a step $t$ into passing a state $s$ to the function and subscripting by a policy.
 
 
@@ -182,15 +279,65 @@ Equation \(\eqref{eq:v}\) gives the definition of v function.
 
 In the following video we tackle this idea in more details.
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=7b8178ed-68d1-4335-8ab7-3d81f214f362&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="940" height="200"frameborder="0" scrolling="no" allowfullscreen title="4. Returns Expectation and Sampling.mkv"></iframe>
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=7b8178ed-68d1-4335-8ab7-3d81f214f362&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="475" height="200"frameborder="0" scrolling="no" allowfullscreen title="4. Returns Expectation and Sampling.mkv"></iframe>
 
-## Bellman Equation for V and Q
+
+## 2. The Bellman Equations
+
+The **Bellman equations** provide recursive relationships between the value of a state (or state-action pair) and the values of neighboring states. These equations are fundamental in solving MDPs and are the basis for many reinforcement learning algorithms.
+
+### 2.1 Bellman Equation for the Value Function
+
+The **value function** \( V_{\pi}(s) \) represents the expected return starting from state \( s \) and following policy \( \pi \). The Bellman equation for \( V_{\pi}(s) \) is:
+
+\[
+V_{\pi}(s) = \mathbb{E}_{\pi}\left[ R(s, a, s') + \gamma \sum_{s'} P(s' | s, a) V_{\pi}(s') \right]
+\]
+
+Where:
+- \( V_{\pi}(s) \) is the value of state \( s \) under policy \( \pi \),
+- \( R(s, a, s') \) is the immediate reward for transitioning from \( s \) to \( s' \) after action \( a \),
+- \( \gamma \) is the discount factor, and
+- \( P(s' | s, a) \) is the transition probability.
+
+### 2.2 Bellman Equation for the Q-Function
+
+The **Q-function** \( Q_{\pi}(s, a) \) represents the expected return after taking action \( a \) in state \( s \) and then following policy \( \pi \). The Bellman equation for \( Q_{\pi}(s, a) \) is:
+
+\[
+Q_{\pi}(s, a) = \mathbb{E}\left[ R(s, a, s') + \gamma \sum_{s'} P(s' | s, a) V_{\pi}(s') \right]
+\]
+
+Where:
+- \( Q_{\pi}(s, a) \) is the action-value function,
+- The terms \( R(s, a, s') \), \( \gamma \), and \( P(s' | s, a) \) are the same as in the value function equation.
+
 
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=6d6d9455-7174-447a-8bcb-eceaa51a4af5&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="5. Bellman v.mkv"></iframe>
 
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=3a18cbb0-6960-42c1-bcf4-8e0893c09c89&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200"frameborder="0" scrolling="no" allowfullscreen title="6. Bellman q simple.mkv"></iframe>
 
-## Bellman Optimality Equations for V and Q
+### 2.3 Bellman Optimality Equations
+
+The **Bellman optimality equations** describe the relationship between the optimal value function \( V^*(s) \) or the optimal Q-function \( Q^*(s, a) \) and the transition and reward dynamics. These equations are used to compute the optimal policy that maximizes the expected return.
+
+#### Bellman Optimality Equation for the Value Function:
+
+\[
+V^*(s) = \max_a \mathbb{E}\left[ R(s, a, s') + \gamma \sum_{s'} P(s' | s, a) V^*(s') \right]
+\]
+
+#### Bellman Optimality Equation for the Q-Function:
+
+\[
+Q^*(s, a) = \mathbb{E}\left[ R(s, a, s') + \gamma \sum_{s'} P(s' | s, a) \max_{a'} Q^*(s', a') \right]
+\]
+
+Where:
+- \( V^*(s) \) is the optimal value function,
+- \( Q^*(s, a) \) is the optimal Q-function,
+- The **max** operator ensures that the agent chooses the action \( a \) that maximizes the expected return.
+
 
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=b73eab99-7af2-4b9e-8909-19492615d273&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. Bellman Optimality 1.mkv"></iframe>
 
@@ -205,22 +352,15 @@ You can adjust the video settings in SharePoint (speed up to 1.2 and reduce the 
 [video:  Bellman Optimality for q from first principles](https://leeds365-my.sharepoint.com/:v:/g/personal/scsaalt_leeds_ac_uk/EVBv-P5S4_VKqFt_E0vikIUBdpV1BZX2V-IDM3ROXDDV4A?e=YQQchV)
 
 
-## Grid World Environments
 
-Ok, so now we are ready to tackle the practicals, please go ahead and download the worksheet and run and experiement with the provided code to build some grid world environments and visualise them and make a simple robot agent takes some steps/actions within these environments!.
+### Summary
 
-You will need to download a python library (Grid.py) that we bespokley developed to help you run RL algorithms on toy problems and be abel to easily visualise them as needed, the code is optimised to run efficiently and you will be able to use these environmnets to test different RL algorithms extensively. Please place the library in the same directory of the worksheet. In general it would be a good idea to place all worksheets and libraries provided in one directory. This will make importing and runing code easier and more streamlined.
+The **Markov Decision Process (MDP)** framework models decision-making problems where an agent interacts with an environment. It includes **transition dynamics** \( P(s' | s, a) \) and **reward dynamics** \( R(s, a, s') \), which describe the behavior of the environment. The **Bellman equations** provide recursive relationships for computing the value of states or actions, while the **Bellman optimality equations** help find the optimal policy. Properties like the **Markov Property**, **stationarity**, and the stochastic nature of the dynamics are key factors in MDPs. Understanding these dynamics and equations is central to reinforcement learning algorithms designed to find optimal decision-making strategies.
 
 
-In a grid world, we have a set of cells that the agent can move between them inside a box. The agent can move left, right, up and down. We can also allow the agent to move diagonally, but this is uncommon. 
+**Further Reading**:
+For further info refer to chapter 3 of the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf). 
 
- We needed to be as efficient as possible, and hence we have chosen to represent each state by its count, where we count from the bottom left corner up to the right top corner, and we start with 0 up to nS-1 where nS is the number of states. This will allow us to streamline the process of accessing and storing a state and will be of at most efficiency. We also deal with actions similarly, i.e. each action of the nA actions is given an index 0..nA-1. For the usual grid, this means 0,1,2,3 for actions left, right, up and down. We represent a 2-d grid by a 1-d array, and so care must be taken on how the agent moves between cells. 
-
-Moving left or right seems easy because we can add or subtract from the *current* state. But when the agent is on the edge of the box, we cannot allow for an action that takes it out of the box. So if the agent is on the far right, we cannot allow it to go further to the right. To account for this issue, we have written a valid() function to validate an action. Moving up and down is similar, but we need to add and subtract a full row, which is how many columns we have in our grid. the valid() function checks for the current state and what would be the next state, and it knows that an agent will overstep the boundary as follows: if s%cols!=0, this means that the agent was not on the left edge and executing a right action (s+a)%cols==0 will take it to the left edge. This means it was on the right edge and wanted to move off this right edge. Other checks are similar. We have also accounted for moving diagonally so the agent will not overstep the boundaries.
-
-We have also accounted for different reward schemes that we might want to use later in other lessons. These are formulated as an array of 4 elements [intermediate, goal1, goal2, cliff] the first reward represents the reward the agent obtains if it is on any intermediate cell. Intermediate cells are non-terminal cells. Goals or terminal states are those that a task would be completed if the agent steps into them. By setting the goals array, we can decide which cells are terminal/goals. As we can see, there are two goals, this will allow us to deal with all the classical problems we will tackle in our RL treatments, but we could have set up more. So, our reward array's second and third elements are for the goals. The last entry is for a cliff. A cliff cell is a special type of non-terminal cell where the agent will emulate falling off a cliff and usually is given a high negative reward and then will be hijacked and put in its start position when it steps into these types of cells. These types of cells are non-terminal in the sense that the agent did not achieve the task when it went to them, but they provoke a reset of the agent position with a large negative reward.
-
-The most important function in our class is the step(a) function. An agent will take a specific action in the environment via this function. Via this function, we return the reward from our environment and a flag (done) indicating whether the task is accomplished. This makes our environment compatible with the classic setup of an OpenAI Gym Atari games, which we deal with towards the end of our RL treatment.
 
 ## Your turn
 Go ahead and play around with some grid world environment by executing and experiementing with the code in the following worksheet.
@@ -228,7 +368,3 @@ Go ahead and play around with some grid world environment by executing and exper
 <!-- <a href="Grid.py" download> Grid world library</a> -->
 
 [worksheet3](../../workseets/worksheet3.ipynb)
-
-## Conclusion
-In this lesson, we covered the basics of RL functions and concepts that we will utilise in other lessons. We also provided you with a environment that you can directly utilise to build simple grid world environments. Please note that you are not required to study the Gris.py file or understand how the grid is programmatically built, but you need to understand how it operates.!
-

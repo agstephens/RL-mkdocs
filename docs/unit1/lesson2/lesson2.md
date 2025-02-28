@@ -6,251 +6,79 @@ Author: Abdulrahman Altahhan,  2025.
 
 ![image-2.png](image-2.png)
 
-In this lesson you will learn about the k-armed bandit problem and its applications in RL. This problem is useful in understanding the basics of RL, in particular it demonstrates how an algorithm can *learn* an action-value function that we normally denote as Q in RL. 
+In this lesson, you will learn about the k-armed bandit problem and its applications in reinforcement learning (RL). This problem is useful for understanding the basics of RL, particularly how an algorithm can *learn* an action-value function, commonly denoted as Q in RL.
 
-**Learning outcomes**
+## Learning Outcomes
 
-1. understand the role the action-value function plays in RL and its relationship with a policy
-2. appreciate the difference between stationary and non-stationary problems
-3. understand how to devise a samples averaging solution to approximate an action-value function
-4. appreciate the different policies types and the role a policy plays in RL algorithms
+By the end of this lesson, you will:
 
-**Reading**:
-The accompanying reading of this lesson are **chapters 1 and 2** of our text book available online [here](http://incompleteideas.net/book/RLbook2020.pdf). Please note that we explain the ideas of this topic from a practical perspective and not from a theoretical perspective which is already covered in the textbook.
-
-In this lesson we develop the basic ideas of dealing with actions and policies which are the distinctive elements that set RL apart from other machine learning sub-disciplines. We study a simple but effective problem of the k-armed bandit. This problem is manifested in other scenarios such as when a medical specialist wants to decide which treatment to give for a patient from a set of medicine, some of which he/she are trying for the first time(exploring). 
-
-Our toy problem is similar to a usual bandit but it is assumed that there is a set of k actions that the agent can choose from. We want to reach an effective policy that allows the agent to maximise its returns (wins). The bandit is assumed to have a Gaussian distribution around a mean reward that is different for each action (armed). Each time an armed is pulled (in our RL terminology we say an action is taken) the bandit will return a reward (positive or negative) by drawing from its Gaussian reward's distribution. The agent's task is to guess which action of these has the highest mean and pull it all the time to maximise its wins. Note that the distributions are fixed and not changing, although we can relax this assumption later.
-
-Ok let us get started! 
+1. Understand the role the action-value function plays in RL and its relationship with a policy.
+2. Appreciate the difference between stationary and non-stationary problems.
+3. Understand how to devise a sample-averaging solution to approximate an action-value function.
+4. Appreciate the different types of policies and the role a policy plays in RL algorithms.
 
 
-Below we import libraries that will be necessary for our implementation. For RL sampling and random number generation is of at most importance we will use them quite extensively. You have come across these in earlier module and if in doubt you can consult the library help available online.
+In this lesson, we develop the foundational concepts of actions and policies, which are the key elements that distinguish RL from other machine learning sub-disciplines. We study a simple yet effective problem: the k-armed bandit. This problem can be applied to scenarios such as a medical specialist deciding which treatment to administer to a patient from a set of medications, some of which they are trying for the first time (exploring).
 
+Our toy problem is similar to the classic bandit problem, but with the assumption that there is a set of **k** actions the agent can choose from. The goal is to develop an effective policy that allows the agent to maximize its returns (wins). The bandit is assumed to have a Gaussian distribution centered around a mean reward, which differs for each action (arm). Each time an arm is pulled (or an action is taken, as we say in RL terminology), the bandit will return a reward (positive or negative) by drawing from its Gaussian reward distribution. The agent's task is to identify which action has the highest mean reward and consistently choose it to maximize its wins. Note that the distributions are fixed and do not change, though we will relax this assumption later.
 
-```python
-%matplotlib inline
-```
-
-
-```python
-import numpy as np
-from numpy import arange
-from numpy.random import rand,randn, seed, randint, choice, uniform, normal, multivariate_normal
-import matplotlib.pyplot as plt
-from tqdm import trange
-import time
-```
+Now, let’s get started!
 
 ## Motivating Example
-Let us assume that we have an armeded bandit with two livers.
 
-### Scenario a
-- We have a deterministic reward function that has a reward of -5 for action $a_1$ (pulling bandit 1)
-- We have a deterministic reward function that has a reward of 00 for action $a_2$ (pulling bandit 2)
-   
-What is the optimal policy for this bandit?
+Let us assume that we have an armed bandit with two levers.
 
-### Scenario b
-- We have a nondeterministic reward function that has a reward of either -5 or 15 with equal probabilities of .5 for action $a_1$ (pulling bandit 1)
-- We have a nondeterministic reward function that has a reward of either 00 or 10 with equal probabilities of .5 for action $a_2$ (pulling bandit 2)
-   
-   
+### Scenario A
+- We have a deterministic reward function that returns a reward of -5 for action $a_1$ (pulling bandit 1).
+- We have a deterministic reward function that returns a reward of 0 for action $a_2$ (pulling bandit 2).
 
-1. What is the net overall reward for actions $a_1$ and $a_2$?
-1. What is the optimal policy for this bandit?
-1. How many optimal policies we have for this bandit?
+**Question**: What is the optimal policy for this bandit?
 
-### Scenario c
-- We have a nondeterministic reward function that has a reward of either -5 or 15 with probabilities .4 and .6 for action $a_1$ (pulling bandit 1)
-- We have a nondeterministic reward function that has a reward of either 00 or 10 with probabilities .5 and .5 for action $a_2$ (pulling bandit 2)
-   
+### Scenario B
+- We have a nondeterministic reward function that returns a reward of either -5 or 15, each with an equal probability of 0.5 for action $a_1$ (pulling bandit 1).
+- We have a nondeterministic reward function that returns a reward of either 0 or 10, each with an equal probability of 0.5 for action $a_2$ (pulling bandit 2).
+
+**Questions**:
 
 1. What is the net overall reward for actions $a_1$ and $a_2$?
-1. What is the optimal policy for this bandit?
-1. How many optimal policies we have for this bandit?
-1. Can find a way to represent this 
+2. What is the optimal policy for this bandit?
+3. How many optimal policies do we have for this bandit?
 
+### Scenario C
+- We have a nondeterministic reward function that returns a reward of either -5 or 15, with probabilities of 0.4 and 0.6 respectively for action $a_1$ (pulling bandit 1).
+- We have a nondeterministic reward function that returns a reward of either 0 or 10, each with a probability of 0.5 for action $a_2$ (pulling bandit 2).
 
-In the code below, we use rand() and arange() functions. rand() is a random number generator function. Each time it is run, it will give a different number in the range [0,1]. arange(), on the other hand, is useful to give us a set of uniformly distributed numbers.
+**Questions**:
 
+1. What is the net overall reward for actions $a_1$ and $a_2$?
+2. What is the optimal policy for this bandit?
+3. How many optimal policies do we have for this bandit?
+4. Can you find a way to represent this?
 
-```python
-rand()
-```
+---
 
-
-
-
-    0.6801911659775486
-
-
-
-
-```python
-arange(0,1,.1)
-```
-
-
-
-
-    array([0. , 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
-
-
-
-
-```python
-# obtaining the value of an action a with binary reward
-
-def Q(pr=.5, r1=15, r2=-5):
-    R = 0
-    N = 100000
-    for i in range(N):
-        R += r1 if rand() <= pr else r2
-
-    return R/N
-```
-
-
-```python
-Pr = arange(0,1,.1)
-Qs1 = [Q(pr, 15, -5) for pr in Pr]
-Qs2 = [Q(pr, 10,  0) for pr in Pr]
-
-plt.xlabel('Reawrd Probability')
-plt.ylabel('Σ Reawrd Expecation')
-plt.plot(Pr, Qs1, label='Q1')
-plt.plot(Pr, Qs2, label='Q2')
-plt.legend()
-plt.show()
-```
-
-
+The figure below gives an insight about some of the above questions. Each line represents a bandit Q1 and Q2.
     
 ![png](output_18_0.png)
-    
 
+As can be seen, the two bandit functions intersect with each other at a probability of 0.5, meaning they are equivalent at this probability. For other probabilities, Bandit 1 is superior for \( pr > 0.5 \) (and hence the optimal policy will be to select this bandit always), while Bandit 2 is superior for \( pr < 0.5 \) (and hence the optimal policy will be to select this bandit always). However, bear in mind that we do not know the underlying probability beforehand, and we would need to try out both bandits to estimate their corresponding value functions in order to come up with a suitable policy.
 
-As can be seen, the two bandits functions intersect with each other at the .5 probability, meaning they are equivalent for this probability. For other probabilities Bandit 1 is superior for pr>.5 (and hence an optimal policy will be to select this bandit always), while Bandit 2 is superior for pr<.5 (and hence an optimal policy will be to select this bandit always). But bear in mind that we do not know the underlying probability before hand, and we would need to try out both to obtain an estimation for their corresponding value functions to be able to come up with a suitable policy.
+Now, let's move on to covering the different concepts of the multi-armed bandit in more detail.
 
-Ok, now we move into covering the different concepts of the multi armeded bandit in more details.
+We proceed by developing simple functions for:
+1. Averaging rewards for statinary policy.
+2. Moving Average of rewards for non-stationary policy.
 
-We start by developing simple functions for 
-1. returning an action from a stationary policy and 
-2. returning a simple fixed reward from a stationary distribution
+<!-- 1. Returning an action from a stationary policy.
+2. Returning a simple fixed reward from a stationary distribution. -->
 
-## Stationary probability
+## Averaging the Rewards for Greedy and ε-Greedy Policies
 
+A greedy policy is a simple policy that always selects the action with the highest action-value. On the other hand, an ε-greedy policy is similar to a greedy policy but allows the agent to take random exploratory actions from time to time. The percentage of exploratory actions is designated by ε (epsilon). Typically, we set ε to 0.1 (10%) or 0.05 (5%). A third type of greedy policy is the dynamic ε-greedy policy, which anneals or decays the exploration factor (ε) over time. In practice, the ε-greedy policy generally works well and often better than more sophisticated policies that aim to strike a balance between exploration and exploitation (where taking the greedy action is called exploitation, and taking other actions is called exploration). Regardless of the approach, we need to allow for some exploratory actions; otherwise, it would not be possible for the agent to improve its policy.
 
-```python
-def stationary(p=[.5, .2, .3]):
-    return choice(np.arange(0,len(p)), 1, p=p)[0]
+Below, we show an implementation of a bandit function that uses an ε-greedy policy. `nA` denotes the number of actions (the number of arms to be pulled). Since we are only dealing with actions, the Q-function has the form of Q(a). The armed bandit is a non-associative problem, meaning we do not deal with states. Later, we will address associative problems, where Q(s, a) has two inputs: the state and the action.
 
-stationary()
-```
-
-
-
-
-    0
-
-
-
-As we can see we passed a distribution for a set of 3 actions and the function chose from these 3 actions according to the distribution. Each time you run the above code it may give a different action. If you repeat the process you will find out that the action choices are distributed according to the passed distribution.
-
-
-```python
-n = 10000
-counts = np.array([0,0,0])
-for _ in range(n):
-    counts[stationary(p=[.5, .2, .3])]+=1
-
-print((counts/n).round(2))
-    
-
-```
-
-    [0.5 0.2 0.3]
-
-
-## Stationary and non-stationary reward
-Once an action is sampled, we can return its reward from a set of rewards. 
-We can start by assuming that each action has a fixed reward. Below we show how to obtain the reward.
-
-
-```python
-def reward(a, r=[10, 20, 30]):
-    return r[a]
-
-print(reward(0), reward(1), reward(2))
-```
-
-    10 20 30
-
-
-Such a reward will be very easy to guess for an observer by just recording each action occurrence once. To address this, we can assume that each action's reward can vary around a mean and a Gaussian, we get lots of variations that makes it difficult for an observer to know the expected reward directly.
-
-
-
-```python
-def reward(a, r=[-20, -30, 40]):
-    return r[a]+r[a]*randn()
-
-print(reward(0), reward(1), reward(2))
-```
-
-    -10.097974534627859 -51.81451370896566 11.677690812495104
-
-
-On average we still expect to obtain more reward by choosing the third action(2) and if we play enough (by sampling from the rewards by taking a specific action) we will obtain the mean of the reward. Of course in a real game this would have an immense loss on the player that it is not a practical worry.
-
-
-```python
-rewards = np.array([0,0,0])
-n = 100000
-for a in range(3):
-    for _ in range(n):
-        rewards[a] += reward(a)
-
-(rewards/n).round(0)
-```
-
-
-
-
-    array([-19., -29.,  40.])
-
-
-
-Note that we still call the above distribution as stationary since it is not changing. So the first case was a point based believe and the second was a stationary distribution. Often, we deal with non-stationary distribution where the distribution itself changes while the agent is interacting with the environment. For example, if the mean of the reward itself is changing then this becomes a non-stationary distribution and the problem becomes non-stationary. Non-stationary problems are common in RL and we will deal with them often. They occur as an artifact of the learning process itself where the agent estimation of the action-value function changes with time which in turn changes the agent policy. This will become clearer in this and other lessons.
-
-## Averaging the Rewards for greedy and ε-greedy policies
-
-Greedy policy is a simple policy that always picks the action with the highest action-value.
-On the other hand, an ε-greedy policy is similar to a greedy policy, however it allows the agent to pick random exploratory actions from time to time. The percentage of those exploratory actions is designated by ε (epsilon). Usually, we set ε to .1 (10%) or .05 (5%). A third type of a greedy policy is a dynamic ε-greedy policy which anneals or decays the exploration factor ε with time. In practice, ε-greedy policy usually works fine and better than more sophisticated policies that strike balance between exploration and exploitation (taking the greedy action is called exploitation while taking other actions is called exploration). Regardless of how, we need to allow for some form of exploratory actions otherwise it would not be possible for the agent to improve its policy.
-
-Below we show an implementation bandit function that uses an ε-greedy policy. nA denotes the number of actions (number of armeds to be pulled). Because we are only dealing with actions the Q function has the form of Q(a). The armed bandit is non-associative problem, meaning we do not deal with states. Later we will deal with associative problems where Q(s,a) has two inputs the state and the action. 
-
-Below we create a function that takes a bandit (in the form of a set of rewards each of which corresponds with an action) and generates a value Q that quantifies the value/benefit that we obtain by taking each action. This is a simple improvement over the code that we have just written earlier to obtain the expected reward of an action. This time we choose actions *randomly instead of uniformly* and hence we need to keep a count of each action. At the end we just divide the sum of obtained rewards over the action's count to obtain the average which is a good estimator of the expected reward.
-
-
-```python
-rand() #[0,1)
-Actions =    [0,  1,    2]
-Q = np.array([0,  10,   10])
-C = np.array([100,50,  75])
-Q.argmax()
-# print(Q/C)
-
-choice(np.argwhere(Q==Q.max()).ravel())
-```
-
-
-
-
-    1
-
-
+We now create a function that takes a bandit (in the form of a set of rewards, each corresponding to an action) and generates a value Q that quantifies the value/benefit obtained by taking each action. This is a simple improvement over the earlier code, where we calculated the expected reward of an action. This time, we choose actions *randomly instead of uniformly*, so we need to keep track of each action. At the end, we divide the sum of the obtained rewards by the count of each action to compute the average, which serves as a good estimator of the expected reward.
 
 
 ```python
@@ -282,15 +110,7 @@ Let us see how the Q_bandit_fixed will learn to choose the best action that yiel
 ```python
 Q_bandit_fixed(bandit=[.1, .2, .7])
 ```
-
-
-
-
     array([0.09772727, 0.19874214, 0.699125  ])
-
-
-
-
     
 ![png](output_37_1.png)
     
@@ -304,14 +124,7 @@ Let us see how the completely greedy policy would do on average:
 ```python
 Q_bandit_fixed(bandit=[.1, .2, .7], ε=0)
 ```
-
-
-
-
     array([0.0999001, 0.       , 0.       ])
-
-
-
 
     
 ![png](output_40_1.png)
@@ -333,17 +146,7 @@ q* (qˣ in the code) represents the actual action-values for the armeds which ar
 generate an experience (rewards)
 
 
-```python
-def bandit(a, qˣ):
-    return qˣ[a] + randn()
-
-print(bandit(a=1, qˣ=normal(0, 1, 10)))
-```
-
-    4.144352710269642
-
-
-This kind of function get us a multivariate normal distribution of size k. To see how we will generate a sample bandit with all of its possible data and plot it.
+We use a function that get us a multivariate normal distribution of size k. Below see how we will generate a sample bandit with all of its possible data and plot it.
 
 
 ```python
@@ -355,8 +158,6 @@ def generate_a_bandit_data(qˣ, T):
 
 generate_a_bandit_data(normal(0, 1, 10), T=100)
 ```
-
-
     
 ![png](output_48_0.png)
     
@@ -412,15 +213,6 @@ plt.subplot(121).plot(R); plt.xlabel('Steps'); plt.ylabel('Average rewrads')
 plt.subplot(122).plot(oA,'.'); plt.xlabel('Steps'); plt.ylabel('%Optimal action')
 
 ```
-
-
-
-
-    Text(0, 0.5, '%Optimal action')
-
-
-
-
     
 ![png](output_53_1.png)
     
@@ -429,132 +221,20 @@ plt.subplot(122).plot(oA,'.'); plt.xlabel('Steps'); plt.ylabel('%Optimal action'
 Note how the % of optimal actions for one trial (run) takes either 1 or 0. This figure to the left seems not be conveying useful information. However when we average this percentage over several runs we will see a clear learning pattern. This is quite common theme in RL. We often would want to average a set of runs/experiments due to the stochasticity of the process that we deal with.
 
 ### Multiple runs (aka trials)
-We need to average multiple runs to obtain a reliable unbiased results that reflect the expected performance of the learning algorithm.
+We need to average multiple runs to obtain a reliable unbiased results that reflect the expected performance of the learning algorithm. We do that via running the same function or algorithm multiple times, which is what the Q_bandits_runs function does. We do not show the code, we only show 
 
-In the Q_bandits_runs() we pass on any extra keyword arguments to the Q_bandit() function. This trick will save us to redefine arguments and it will be utilised extensively in our treatment of RL algorithms. 
-
-
-If you are not familiar with it please refer to the many online tutorials such as [this](https://realpython.com/python-kwargs-and-args/). Before you do that we provide a quick cap here. You can think of and read ' **kw ' to be equivalent to ' etc ' in plain English.
+Note that we obtain different set of 10-bandit distributions and conduct an experimental run on them. Because all of them are normally standard distribution their sums of rewards (values) converges to the same quantity around 1.5.
 
 
-```python
-def func1(c=10): print(c); func2() 
-def func2(d=20): print(d)
-func1(c=10)
-```
-
-    10
-    20
-
-
-The problem with the above is that we cannot change d via func1, to do so we can use the arbitrary **kw trick. Note that kw is just a dictionary of keys and values like any python dictionary.
-
-
-```python
-def func1(c=10, **kw): print(c); func2(**kw)
-def func2(d=20):       print(d)
-func1(c=10, d=30)
-```
-
-    10
-    30
-
-
-As you can see we passed d inside func1 although it is not originally in the set of keywords arguments of func1. Also if we later changed the prototype of func2() we do not need to change func1(). For example:
-
-
-```python
-def func2(d=20, f=200): print(d); print(f)
-func1(c=10, d=30, f=66)
-```
-
-    10
-    30
-    66
-
-
-One more thing: we use trange(runs) instead of range(runs) because it gives us a bar to indicate how much left for the process to finish. This is quite useful when we do extensive runs.
-
-
-```python
-for run in trange(10):
-    time.sleep(.1)
-```
-
-    100%|███████████████████████████████████████████| 10/10 [00:01<00:00,  9.55it/s]
-
-
-Ok now we are ready to the Q_bandits_runs() definition.
-
-
-```python
-def Q_bandits_runs(Q_bandit, runs=2000, T=1000,  k=10,  label='', **kw):
-    #np.random.seed(20) # this allows us to generate the same experience for consistency, you can comment it out
-    
-    R = np.zeros((runs, T))  # rewards over runs and time steps
-    oA = np.zeros((runs, T))  # optimal actions over runs and steps
-
-    for run in trange(runs):
-        
-        # generate the k-armed bandit actual q* values by calling normal(0, 1, k) 
-        R[run], oA[run] = Q_bandit(qˣ=normal(0, 1, k) , T=T, **kw)
-        
-    plt.gcf().set_size_inches(16, 3.5)
-    
-    subplotQ_bandits_runs(R.mean(0), 1, label=label, ylabel='Average rewrads')
-    plt.yticks([0, .5, 1, 1.5])
-    
-    subplotQ_bandits_runs(oA.mean(0), 2, label=label, ylabel='%Optimal action')
-    plt.yticks(np.arange(0,1.2,.2), ['0%', '20%', '40%', '60%', '80%', '100%'])
-
-```
-
-Where subplotQ_bandits_runs function handles the learning curve plots for us and is given below. Note that in the above we obtain different set of 10-bandit distributions and conduct an experimental run on them. Because all of them are normally standard distribution their sums of rewards (values) converges to the same quantity around 1.5.
-
-
-```python
-def subplotQ_bandits_runs(experience, i, label, ylabel=''):
-    x = int(.6*experience.shape[0])
-    plt.subplot(1,2,i)
-    
-    plt.plot(experience)
-    plt.annotate(label, xy=(x,experience[x]), fontsize=14)
-    plt.xlabel('Steps')
-    plt.ylabel(ylabel)
-    plt.gca().spines['right'].set_visible(False)
-    plt.gca().spines['top'].set_visible(False)
-```
 
 ### Action Selection (Policy) Comparison:
 Now we are ready to compare between policies with different exploration rates ε. Note that ε kw(keyword argument) has been passed on to the Q_bandit() function from the Q_bandits_runs() function.
-
-
-```python
-Q_bandits_runs(ε=.1,  label='ε=.1',  Q_bandit=Q_banditAvg, runs=1000)
-```
-
-    100%|██████████████████████████████████████| 1000/1000 [00:04<00:00, 238.61it/s]
-
-
-
-    
-![png](output_68_1.png)
-    
-
-
 
 ```python
 Q_bandits_runs(ε=.1,  label='ε=.1',  Q_bandit=Q_banditAvg)
 Q_bandits_runs(ε=.01, label='ε=.01', Q_bandit=Q_banditAvg)
 Q_bandits_runs(ε=.0,  label='ε=.0' , Q_bandit=Q_banditAvg)
 ```
-
-    100%|██████████████████████████████████████| 2000/2000 [00:07<00:00, 257.52it/s]
-    100%|██████████████████████████████████████| 2000/2000 [00:07<00:00, 274.10it/s]
-    100%|██████████████████████████████████████| 2000/2000 [00:07<00:00, 279.78it/s]
-
-
-
     
 ![png](output_69_1.png)
     
@@ -570,13 +250,7 @@ If we look at the sum
 $$
 % \begin{aligned}
 Q_{t+1}  = \frac{1}{t}\sum_{i=1}^{t}R_i = \frac{1}{t}\left(\sum_{i=1}^{t-1}R_i + R_t\right) 
-$$
-
-$$
         = \frac{1}{t}\left((t-1)\frac{\sum_{i=1}^{t-1}R_i}{t-1} + R_t\right) 
-$$
-
-$$
         = \frac{1}{t}\left(\left(t-1\right)Q_t + R_t\right) 
 $$
 
@@ -593,68 +267,7 @@ $$
 
 Note that incremental updates plays a very important role in RL and we will be constantly seeking them due to their efficiency in online application.
 
-Below we redefine our Q_bandit function to be incremental. Note how we adjust each Q[a] with the difference between its reward estimate and the actual reward estimate then we divide by the action count N[a]
-
-$$ Q[a] += (R[a,t]- Q[a])/N[a] $$ 
-
-
-We also tidy up a bit so that the setup code is not repeated later when we change the update.
-
-
-```python
-def bandit_init(qˣ, T, q0=0):
-
-    # |A| and max(q*)
-    nA   = qˣ.shape[0]                # number of actions, usually 10
-    amax = qˣ.argmax()                # the optimal action for this bandit
-
-    # stats.
-    r  = np.zeros(T)                  # reward at time step t
-    a  = np.zeros(T, dtype=int)       # chosen action at time step t, needs to be int as it will be used as index
-    
-    # estimates
-    Q = np.ones(nA)*q0                # action-values all initialised to q0
-    N = np.zeros(nA)                  # 👀 earlier we cheated a bit by initialising N to ones to avoid div by 0
-
-    return nA,amax,  r,a,  Q,N
-
-```
-
-
-```python
-def Q_banditN(qˣ, ε=.1, T=1000, q0=0):
-    nA,amax,  r,a,  Q,N = bandit_init(qˣ, T, q0)
-    
-    for t in range(T):
-        # choose a[t]
-        if rand()<= ε: a[t] = randint(nA)     # explore
-        else:          a[t] = Q.argmax()      # exploit, 👀 note that we do not use Q/N as before
-        
-        # get the reward from bandit
-        r[t]  = bandit(a[t], qˣ)
-        
-        # update Q (action-values estimate)
-        N[a[t]] += 1
-        Q[a[t]] += (r[t] - Q[a[t]])/N[a[t]]   
-
-    return r, a==amax
-```
-
-Now we can call again our Q_bandits_runs which will use the newly defined Q_bandit
-
-
-```python
-Q_bandits_runs(ε=.1,  label='ε =.1',  Q_bandit=Q_banditN, runs=200)
-```
-
-    100%|████████████████████████████████████████| 200/200 [00:00<00:00, 238.21it/s]
-
-
-
-    
-![png](output_76_1.png)
-    
-
+Below we show the results of running a code that was designed to capture the ideas of incremental implementation via a function called Q_banditN. *We do not show the code of Q_banditN here*
 
 
 ```python
@@ -663,13 +276,6 @@ Q_bandits_runs(ε=.1,  label='ε =.1',  Q_bandit=Q_banditN)
 Q_bandits_runs(ε=.01, label='ε =.01', Q_bandit=Q_banditN)
 Q_bandits_runs(ε=.0,  label='ε =.0',  Q_bandit=Q_banditN)
 ```
-
-    100%|██████████████████████████████████████| 2000/2000 [00:07<00:00, 255.15it/s]
-    100%|██████████████████████████████████████| 2000/2000 [00:07<00:00, 264.25it/s]
-    100%|██████████████████████████████████████| 2000/2000 [00:07<00:00, 264.78it/s]
-
-
-
     
 ![png](output_77_1.png)
     
@@ -677,81 +283,6 @@ Q_bandits_runs(ε=.0,  label='ε =.0',  Q_bandit=Q_banditN)
 
 ## Non-stationary Problems
 The limitation of the above implementation is that it requires actions counts and when the underlying reward distribution changes (non-stationary reward distribution) it does not respond well to take these changes into account. A better approach when we are faced with such problems is to use a fixed size step <1 instead of dividing by the actions count. This way, because the step size is small the estimate gets updated when the underlying reward distribution changes. Of course this means that the estimates will keep changing even when the underlying distribution is not changing, however in practice this is not a problem when the step size is small enough. This effectively gives more weights to recent updates which gives a good changes-responsiveness property for this and similar methods that use a fixed size learning step $\alpha$.
-
-Note that the majority of RL problem are actually non-stationary. This is because, as we shall see later, when we gradually move towards an optimal policy by changing the Q action-values, the underlying reward distribution changes in response to taking actions that are optimal according to the current estimation. This is also the case here but in a subtle way.
-
-
-```python
-Q = np.array([0, 0, -1])
-choice(np.argwhere(Q==Q.max()).ravel())
-```
-
-    1
-
-
-
-
-```python
-def Q_banditα(qˣ,  α=.1, ε=.1, T=1000, q0=0):
-    
-    nA, amax, r, a, Q, _ = bandit_init(qˣ, T, q0)
-    
-    for t in range(T):
-        # choose a[t]
-        if rand()<= ε: a[t] = randint(nA)     # explore
-        else:          a[t] = Q.argmax()      # exploit, 👀 note that we do not use Q/N as before
-        
-        # get the reward from bandit
-        r[t]  = bandit(a[t], qˣ)
-        
-        # update Q (action-values estimate)
-        Q[a[t]] += α*(r[t] - Q[a[t]])  # 👀 constant step-size α: yields exponential recency-weighted average
-                                       #    similar form of update will be used Throughout the unit
-
-    return r, a==amax
-```
-
-The above is a neat way to learn the action-value function and it preferred due the reasons that we mentioned earlier.
-
-### Comparison
-Let us now compare different exploration rates for this learning function. 
-
-
-```python
-Q_bandits_runs(ε=.1,  label='ε=.1',  Q_bandit=Q_banditα, T=5000, runs=2000)
-Q_bandits_runs(ε=.01, label='ε=.01', Q_bandit=Q_banditα, T=5000, runs=2000)
-Q_bandits_runs(ε=.0,  label='ε=.0',  Q_bandit=Q_banditα, T=5000, runs=500)
-```
-
-    100%|███████████████████████████████████████| 2000/2000 [00:29<00:00, 68.58it/s]
-    100%|███████████████████████████████████████| 2000/2000 [00:25<00:00, 79.46it/s]
-    100%|█████████████████████████████████████████| 500/500 [00:06<00:00, 76.24it/s]
-    
-![png](output_83_1.png)
-    
-
-## Q_bandit in a better form
-
-Let us finally define some useful policy functions and redefine and further simplify the Q_bandit function.
-
-### Policies: Exploration vs. Exploitation
-Getting the right balance between exploration and exploitation is a constant dilemma in RL.
-One simple strategy as we saw earlier is to explore constantly occasionally ε% of the time! which we called ε-greedy. Another strategy is to insure that when we have multiple actions that are greedy we chose ebtween them equally and not bias one over the other. This is what we do in the greedyStoch policy below.
-
-We start by showing how to randomly choose between two max Q value actions.
-
-
-```python
-Q = np.array([.2 , .4, .4])
-actions=[]
-for _ in range(30):
-    actions.append(choice(np.argwhere(Q==Q.max()).ravel()))
-print(actions)
-```
-
-    [2, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2]
-
-
 
 ```python
 # returns one of the max Q actions; there is an element of stochasticity in this policy
@@ -787,18 +318,11 @@ def Q_banditα(qˣ,  α=.1, ε=.1, T=1000, q0=0, policy=εgreedy):
     return r, a==amax
 ```
 
+Note that the majority of RL problem are actually non-stationary. This is because, as we shall see later, when we gradually move towards an optimal policy by changing the Q action-values, the underlying reward distribution changes in response to taking actions that are optimal according to the current estimation. This is also the case here but in a subtle way.
+
+
+### Compare different learning rates
 Let us compare different *learning rates* α to see how our Q_bandits() function reacts to them. 
-
-
-```python
-Q_bandits_runs(α=.1,  label='α=.1',  Q_bandit=Q_banditα)
-```
-
-    100%|██████████████████████████████████████| 2000/2000 [00:05<00:00, 347.86it/s]
-    
-![png](output_92_1.png)
-    
-
 
 
 ```python
@@ -807,20 +331,27 @@ Q_bandits_runs(α=.01, label='α=.01', Q_bandit=Q_banditα)
 Q_bandits_runs(α=.5,  label='α=.5',  Q_bandit=Q_banditα)
 Q_bandits_runs(α=.0,  label='α=.0',  Q_bandit=Q_banditα)
 ```
-
-    100%|██████████████████████████████████████| 2000/2000 [00:05<00:00, 335.52it/s]
-    100%|██████████████████████████████████████| 2000/2000 [00:06<00:00, 330.52it/s]
-    100%|██████████████████████████████████████| 2000/2000 [00:05<00:00, 342.88it/s]
-    100%|██████████████████████████████████████| 2000/2000 [00:06<00:00, 331.20it/s]
-
-
-
     
 ![png](output_93_1.png)
     
 
+### Policies: Exploration vs. Exploitation
+Getting the right balance between exploration and exploitation is a constant dilemma in RL.
+One simple strategy as we saw earlier is to explore constantly occasionally ε% of the time! which we called ε-greedy. Another strategy is to insure that when we have multiple actions that are greedy we chose ebtween them equally and not bias one over the other. This is what we do in the greedyStoch policy below.
 
-## Optimistic Initial Values
+Let us now compare different exploration rates for this learning function. As before we show the results only not the code.
+
+
+```python
+Q_bandits_runs(ε=.1,  label='ε=.1',  Q_bandit=Q_banditα, T=5000, runs=2000)
+Q_bandits_runs(ε=.01, label='ε=.01', Q_bandit=Q_banditα, T=5000, runs=2000)
+Q_bandits_runs(ε=.0,  label='ε=.0',  Q_bandit=Q_banditα, T=5000, runs=500)
+```    
+![png](output_83_1.png)
+ 
+
+
+### Optimistic Initial Values as an Exploration Strategy
 
 It turns out that we can infuse exploration in the RL solution by optimistically initialising the Q values.
 This encourages the agent to explore due to its disappointment when its initial Q values are not matching the reward values that are coming from the ground (interacting with the environment). This intrinsic exploration motive to explore more actions at the start, vanishes with time when the Q values become more realistic. 
@@ -831,31 +362,9 @@ Ok, we will apply the same principle to stochastically return one of the max Q a
 
 
 ```python
-Q_bandits_runs(ε=.1, q0=0, label='ε=.1  Realistic Q=0',  Q_bandit=Q_banditα)
-Q_bandits_runs(ε=0 , q0=5, label='ε=0   Optimistic Q=5', Q_bandit=Q_banditα)
-```
-
-    100%|██████████████████████████████████████| 2000/2000 [00:05<00:00, 334.63it/s]
-    100%|██████████████████████████████████████| 2000/2000 [00:04<00:00, 404.58it/s]
-
-
-
-    
-![png](output_97_1.png)
-    
-
-
-
-```python
 Q_bandits_runs(ε=.1, q0=0, label='ε=.1  Realistic Q=0',  Q_bandit=Q_banditα, policy=εgreedyStoch)
 Q_bandits_runs(ε=0 , q0=5, label='ε=0   Optimistic Q=5', Q_bandit=Q_banditα, policy=εgreedyStoch)
 ```
-
-    100%|███████████████████████████████████████| 2000/2000 [01:01<00:00, 32.73it/s]
-    100%|███████████████████████████████████████| 2000/2000 [01:06<00:00, 30.04it/s]
-
-
-
     
 ![png](output_98_1.png)
     
@@ -866,8 +375,15 @@ As we can see above the optimistic initialization has actually beaten the consta
 ## Conclusion
 In this lesson you have learned about the importance of the action value function Q and stationary and non-stationary reward distribution and how we can devise a general algorithms to address them and we concluded by showing an incremental learning algorithm to tackle the k-armed bandit problem. You have seen different exploration strategy and we extensively compared between exploration rates and learning rates for our different algorithms.
 
+## Further Reading
+
+For further information refer to chapters 1 and 2 of the [rl book]((http://incompleteideas.net/book/RLbook2020.pdf)). 
+<!-- Please note that we approach the ideas in this lesson from a practical perspective, which complements the theoretical coverage in the textbook. -->
+
 ## Your Turn
 
-1. Define a softmax policy as per its definition in eq. 2.11, then compare the Q_bandits_runs on ε-greedy and softmax policies.
-2. Combine the optimistic initialisation and exploration rates and see how the bandit_Q function react to them.
+[Worksheet2](../../workseets/worksheet2.ipynb) implement the above concepts and more. Please experiment with the code and run it to get familiar with the essential concepts presented in the lessons.
 
+<!-- 1. Define a softmax policy as per its definition in eq. 2.11, then compare the Q_bandits_runs on ε-greedy and softmax policies.
+1. Combine the optimistic initialisation and exploration rates and see how the bandit_Q function react to them.
+ -->
