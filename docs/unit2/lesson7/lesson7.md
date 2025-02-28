@@ -262,5 +262,8 @@ Follow [Worksheet7](worksheet7.md) to understand how to deal with ros2 programat
   [worksheet8.2](../../workseets/worksheet8.2.ipynb) -->
 
 
+<!-- # Unit's conclusion
+This lesson concludes our unit where we have studied important formulations of RL all of which assumed that we use a table representation for our state space. In the next unit, we will study other offline and fully online RL algorithms that use bootstrapping. Additionally, we will study planning algorithms and then use function approximation instead of a table to represent the state space that can be continuous and infinite. -->
+
 # Unit's conclusion
 This lesson concludes our unit where we have studied important formulations of RL all of which assumed that we use a table representation for our state space. In the next unit, we will study other offline and fully online RL algorithms that use bootstrapping. Additionally, we will study planning algorithms and then use function approximation instead of a table to represent the state space that can be continuous and infinite.
