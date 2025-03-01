@@ -1,5 +1,3 @@
-Author: Abdulrahman Altahhan,  2025.
-
 # Lesson 2- Understanding Q via K-armed Bandit
 
 ![image-3.png](image-3.png)

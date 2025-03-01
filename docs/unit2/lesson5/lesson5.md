@@ -1,3 +1,12 @@
+<script>
+  window.MathJax = {
+    tex: {
+      tags: "ams",  // Enables equation numbering
+    //   displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+
 # Lesson 5- Dynamic Programming: Model-Based Approach
 
 **Unit 2: Learning Outcomes**  
@@ -31,23 +40,10 @@ For These problems we will design Policy Evaluation Methods that attempt to find
 2. Control problems 
 For These problems we will design Value Iteration methods which utilise the idea of Generalised Policy Iteration. They attempt to find the best policy, via estimating an action-value function for a current policy then moving to a better and improved policy by choosing a greedy action often.
 
-## Basics Dynamic Programming
-
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=55e740c0-8e7f-4735-b5cd-3a8911e9fc16&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create"  width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="8. Dynamic Programming 1.mkv"></iframe>
-
-
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=da8f61f0-2c2d-4ec2-9ac1-ef73d31de388&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create"  width="470" height="200"frameborder="0" scrolling="no" allowfullscreen title="8. Dynamic Programming 2.mkv"></iframe>
-
-## Policy Evaluation and Value Iteration
-
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=7523c957-a9cb-4e87-b55c-1c449702ba9c&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create"  width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="9. policy evaluation.mkv"></iframe>
-
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=7523c957-a9cb-4e87-b55c-1c449702ba9c&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create"  width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="9. policy evaluation.mkv"></iframe>
-
 
 ## Inducing the dynamics by interacting with the environment
 
-We cover obtaining the dynamics from an actual environment. We will use mainly the random walk environment and the grid world environment and generate their dynamics. These are deterministic simple environments. Nevertheless, they are very useful to demonstrate the ideas of RL. 
+We cover obtaining the dynamics from an actual environment in the practicals. We will use mainly the random walk environment and the grid world environment and generate their dynamics. These are deterministic simple environments. Nevertheless, they are very useful to demonstrate the ideas of RL. 
 
 Note that when we move to the real world the dynamics become much more complex and building or obtaining the dynamic becomes impractical in most cases. Therefore, towards that end instead of dealing directly with the environment's dynamics, we will see later how we can substitute this requirement by having to *interact* with the environment to gain *experience* which will help us *infer* a good *estimate* of the *expected* value function (discounted sum of rewards) which in turn will help us to *infer* a close to *optimal policy* for the task in hand. 
 
@@ -71,345 +67,153 @@ One important point to make is that stochasticity comes from different elements 
 1. There might be stochasticity or randomness in observing the current state due to the complexity of the state space. 
    For example, when a robot moves around in the environment, after a while, we cannot reliably designate its position from its motor encoders even when we know the start position due to dead-reckoning. This is called partial observability, and there is a framework called BOMDP or partially observable MDP to tackle this problem. However, we will not study this branch. The field is divided about the necessity of BOMDP with a line of thought that considers that we can overcome this difficulty by encoding our states differently but staying in the MDP framework.
 
-These sources of stochasticity dictate using suitable techniques to obtain the dynamics and to evaluate or improve stochastic and deterministic policy.
+These sources of stochasticity dictate using suitable techniques to obtain the dynamics and to evaluate or improve stochastic and deterministic policy. You will see an implementation of this in the associated worksheet.
 
-Some environments might allow the agent to jump over some obstacles or simply skip cells. For these, we define slightly altered dynamics to take the jumps into account. Below we show the definition.
-
-
-```python
-def dynamics(env=randwalk(), stoch=False, show=False, repeat=1000): # , maxjump=1
-
-    rewards = env.rewards_set()
-    nS, nA, nR = env.nS, env.nA, rewards.shape[0]
-    p  = np.zeros((nS,nR,  nS,nA))
-    randjump = env.randjump
-    env.randjump = False # so that probability of all intermed. jumps is correctly calculated
-    for i in trange(repeat if stoch else 1): # in case the env is stochastic (non-deterministic)
-        for s in range(nS):
-            if s in env.goals: continue # uncomment to explicitly make pr of terminal states=0
-            for a in range(nA):
-                for jump in (range(1,env.jump+1) if randjump else [env.jump]):
-                    if not i and show: env.render() # render the first repetition only
-                    env.s = s
-                    env.jump = jump
-                    rn = env.step(a)[1]
-                    sn = env.s
-                    rn_ = np.where(rewards==rn)[0][0] # get reward index we need to update
-                    p[sn,rn_, s,a] +=1
-                    
-    env.randjump = randjump
-    # making sure that it is a conditional probability that satisfies Bayes rule
-    for s in range(nS):
-        for a in range(nA):
-            sm=p[:,:, s,a].sum()
-            if sm: p[:,:, s,a] /= sm
-            
-    return p
-```
 
 # Dynamic Programming Methods
 
-Ok so we are ready now to move to Dynamic programming algorithms to solve the RL problem of finding a best estimate of a value function and or finding an optimal policy.
+Ok so we are ready now to move to Dynamic programming algorithms to solve the RL problem of finding a best estimate of a value function and or finding an optimal policy. Dynamic Programming (DP) refers to a collection of algorithms used for solving Markov Decision Processes (MDPs). DP methods rely on the principle of optimality and require a known model of the environment (transition probabilities and rewards). The main algorithms used in DP are **Policy Evaluation**, **Policy Iteration**, and **Value Iteration**.
 
-## Policy evaluation
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=55e740c0-8e7f-4735-b5cd-3a8911e9fc16&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create"  width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="8. Dynamic Programming 1.mkv"></iframe>
+
+
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=da8f61f0-2c2d-4ec2-9ac1-ef73d31de388&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create"  width="470" height="200"frameborder="0" scrolling="no" allowfullscreen title="8. Dynamic Programming 2.mkv"></iframe>
+
+
+## Policy Evaluation
 
 The first step to improving any policy is to evaluate how good or bad the policy is for the given task. This fundamental question can be addressed by tying up the task with a reward function that basically rewards the agent for achieving the task or a subtask that leads to the final goal. The agent's aim then becomes to collect as many rewards as possible (or to incur as few losses as possible), which should help the agent achieve the given task. One example is when a robot is moving in an environment, and we want it to reach a specific location, then we can reward/punish the robot for each step that is taking it close to the goal or away from it. But this awareness of the goal location is usually difficult to attain in real environments. Hence it is replaced by rewarding the agent when it reaches the goal or punishing the agent for each step taken without reaching the goal location.
 
 We can devise an evaluation strategy based on the discounted sum of rewards the agent is *expected* to collect while executing the task. The strategy depends on the dynamics of the environment. You may want to read section 4.1 and come back here to continue reading the code for the policy evaluation algorithm to get an insight into how it works.
 
 
-```python
-def Policy_evaluation(env=randwalk(), p=None, V0=None, π=None, γ=.99, θ=1e-3, show=False): 
+
+
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=7523c957-a9cb-4e87-b55c-1c449702ba9c&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create"  width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="9. policy evaluation.mkv"></iframe>
+
+In summary, policy evaluation computes the **state-value function** \( V^{\pi} \) for a given policy \( \pi \). It determines how good it is to follow a specific policy in an MDP. Below we show the pseudocode for this algorithm. *Bellman equation is the basis of the update used in policy evaluation algorithm.*
+
+### Policy Evaluation Algorithm:
+
+\(
+\begin{array}{ll}
+\textbf{Algorithm: }  \text{Policy Evaluation} \\
+\textbf{Input: }  \text{MDP } (S, A, P, R, \gamma), \text{ Policy } \pi, \text{ Threshold } \theta \\
+\textbf{Initialize: }  V(s) \leftarrow 0, \forall s \in S \\
+\textbf{Repeat:}  \\
+\quad \Delta \leftarrow 0 \\
+\quad \textbf{For all } s \in S:  \\
+\quad \quad v \leftarrow V(s) \\
+\quad \quad V(s) \leftarrow \sum_{a \in A} \pi(a | s) \sum_{s' \in S} P(s' | s, a) [R(s, a, s') + \gamma V(s')] \\
+\quad \quad \Delta \leftarrow \max(\Delta, |v - V(s)|) \\
+\textbf{Until:}  \Delta < \theta \\
+\textbf{Return:}  V^{\pi}(s), \forall s \in S
+\end{array}
+\)
     
-    # env parameters
-    nS, nA, nR, rewards = env.nS, env.nA, env.nR, env.rewards_set()
-    p = dynamics(env) if p is None else np.array(p)
-
-    # policy parameters
-    V = np.zeros(nS)     if V0 is None else np.array(V0); V[env.goals] = 0 # initial state values
-    π = np.zeros(nS,int) if π  is None else np.array(π) # policy to be evaluated **stochastic/deterministic**
-
-    i=0
-    # policy evaluation --------------------------------------------------------------
-    while True:
-        Δ = 0
-        i+= 1
-        # show indication to keep us informed
-        if show: clear_output(wait=True); rng = trange(nS) # 
-        else: rng = range(nS)
-        for s in rng:
-            if s in env.goals: continue # only S not S+
-            v, V[s] = V[s], 0            
-            for sn in range(nS): # S+
-                for rn_, rn in enumerate(rewards): # get the next reward rn and its index rn_
-                    if π.ndim == 1: # deterministic policy
-                        V[s] += p[sn,rn_, s,π[s]]*(rn + γ*V[sn])
-                    else:           # stochastic policy 
-                        V[s] += sum(π[s,a]*p[sn,rn_, s,a]*(rn + γ*V[sn]) for a in range(nA))
-            Δ = max(Δ, abs(v-V[s]))
-        if Δ<θ: break
-    if show: 
-        env.render(underhood='V', V=V)
-        print('policy evaluation stopped @ iteration %d:'%i)
-
-    return V
-```
-
-Note that we assume that when the policy is deterministic, it takes the shape (nS,) and its entries are actions ex. π[s]=1 means take right(1) when in state s.
-
-On the other hand if the policy is probabilistic, it has a shape of (nS, nA) and its entries are probabilities of each action given a state s, i.e π[a|s] written as π[s,a] in the code.
-
+The existence and uniqueness of $v_\pi$ guaranteed as long as either  $\gamma< 1$ or eventual termination is guaranteed from all states under the policy $\pi$. 
 Note that $\gamma$ must be $< 1$ to guarantee convergence of the Bellman equation because, in general, we do not know whether the policy guarantees reaching a terminal(goal) state; if we do, then $\gamma=1$ is ok. 
+<!-- This condition can be relaxed when we move to sampling instead of dynamic programming in the next consequent lessons. -->
 
-Refer to section 4.1 in the book: 'The existence and uniqueness of $v_\pi$ guaranteed as long as either  $\gamma< 1$ or eventual termination is guaranteed from all states under the policy $\pi$'.
+## Policy Improvement Theorem
+The **Policy Improvement Theorem** states that if for all states:
+\[
+Q_{\pi}(s, a^*) > V_{\pi}(s)
+\]
+where \( a^* = \arg\max_a Q_{\pi}(s, a) \), then choosing \( a^* \) instead of the action dictated by \( \pi \) results in a strictly better policy. This theorem justifies **Policy Iteration**.
 
-This condition can be relaxed when we move to sampling instead of dynamic programming in the next consequent lessons.
+Based on this important theorem, we can then devise an algorithm that improve our policy. A natural way to do this to first evaluate the current policy then improve it, then evaluate the improved policy and then improve it, and so on until the policy stabilise which means we reached an optimal policy that cannot be improved any more. This idea of *iteratively* improving the policy constitute the base for two algorithms that we cover, Policy Iteration and Value Iteration.
 
+## Policy Iteration
+Now that we know how to evaluate a policy, it is time to improve it. Policy iteration is a fundamental algorithm. It explicitly and iteratively tries first to reach a highly accurate estimate of the value function of the current policy, then it tries to improve the policy by maximising the probability of greedy actions as per the current value function. Evaluating the current policy fully and then improving it via policy iteration can be inefficient, but it shows the fundamental ideas behind reinforcement learning. 
 
-### Policy Evaluation for 2d MDP Grid World
-Let us test our policy evaluation algorithm on the following simple 3x3 grid world
+Policy Iteration is an iterative process to find the optimal policy \( \pi^* \). It consists of two alternating steps:
 
+1. **Policy Evaluation:** Compute \( V^{\pi} \) using the policy evaluation algorithm.
+2. **Policy Improvement:** Improve the policy by acting greedily with respect to \( V^{\pi} \):
+   \[
+   \pi'(s) = \arg\max_a \sum_{s'} P(s' | s, a) [R(s, a, s') + \gamma V(s')]
+   \]
+3. Repeat until \( \pi \) converges to \( \pi^* \).
 
-```python
-env3x3 = Grid(gridsize=[3, 3], s0=0, goals=[8], figsize=[10,1])
-π = [3, 1, 3, 1, 1, 3, 2, 2, -1] # guarantee to reach the terminal state hence γ=1 is ok
-π_ = [3, 0, 0, 1, 2, 0, 0, 0, -1] # no way to terminal state hence γ=1 leads to an infinite loop
-env3x3.render(underhood='π', π=π)
-```
-![png](output_71_0.png)
-```python
-V0 = [.6, .5, .5, .2, .1, .2, .1, .5, 0]
-V = Policy_evaluation(env=env3x3, π=π, V0=V0, γ=.9, show=True)
-env3x3.render(underhood='V', V=V)
-``` 
-![png](output_72_0.png)
+So as you can see the policy improvement step is based on *Bellman Optimality equation*.
+Belwo we show the pseduocode for thsi algorithm.
 
-
-```python
-env = maze()
-π = np.ones(env.nS, dtype=np.uint32)*3 # always go up
-V = Policy_evaluation(env=env, π=π, show=True)
-```
-
-
-![png](output_75_0.png)
-    
-
-
-    policy evaluation stopped @ iteration 6:
-
-
-As we can see moving up yeild some benefits mainly in the cells that lead to the goal.
-
-Let us now generate a random policy and evaluate it for a maze environment.
-
-
-```python
-env = maze()
-π = np.random.randint(env.nA, size=env.nS, dtype=np.uint32)
-```
-
-```python
-V = Policy_evaluation(env=env, π=π, show=True)
-```
-
-![png](output_80_0.png)
-    policy evaluation stopped @ iteration 1:
+### Policy Iteration Algorithm:
+\(
+\begin{array}{ll}
+\textbf{Algorithm: }  \text{Policy Iteration} \\
+\textbf{Initialize: } \pi \text{ arbitrarily} \\
+\textbf{Repeat:}  \\
+\quad \text{Policy Evaluation (using above algorithm)} \\
+\quad \text{Policy Improvement:} \\
+\quad \quad \textbf{For all } s \in S: \\
+\quad \quad \quad \pi'(s) \leftarrow \arg\max_a \sum_{s'} P(s' | s, a) [R(s, a, s') + \gamma V(s')] \\
+\quad \quad \quad \textbf{If } \pi'(s) \neq \pi(s) \text{ then policy is not stable} \\
+\textbf{Until:} \pi \text{ is stable} \\
+\textbf{Return:} \pi^*, V^{\pi^*}
+\end{array}
+\)
 
 
-As we can see, the randomly generated policy is chaotic and carry little value for the agent. However, evaluating different policies is highly important for an agent since it can guide the improvement of its adopted policy (based on this ability). One example is to keep evaluating random policies until some computational resources are consumed and pick the best. Below we show such a strategy of searching for an optimal policy. You can apply all other search algorithms that you have come across before in conventional AI (breadth-first etc.).
-
-
-```python
-env = maze()
-Vmax= np.zeros((env.nS))
-p = dynamics(env)
-print('Vmax before search', Vmax.sum())
-```
-
-    Vmax before search 0.0
-
-
-```python
-import random
-random.seed(0)
-np.random.seed(0)
-
-for _ in trange(1000):
-    # π = np.random.randint(env.nA, size=env.nS)
-    π = choices(range(env.nA), k=env.nS)
-    V = Policy_evaluation(env=env, π=π, p=p, show=False)
-    if V.sum() > Vmax.sum(): 
-        Vmax = V
-        πmax = π
-
-env.render(underhood='π', π=πmax)
-print('Vmax after search', Vmax.sum())
-```
-
-
-    
-![png](output_83_0.png)
-    
-
-
-    Vmax after search 10.704460219301
-
-
-As we can see, finding the optimal policy by random search is difficult since the space of policies is huge, making exhaustive or random search infeasible (dimensionality problem). We need a way to take and maintain a step in the right direction of improving the policy. As you have already seen in another module, a greedy search can often lead to a good result. The next section shows a simple but effective strategy to gradually improve a policy by taking a greedy step towards the solution.
-
-## Policy Iteration 
-Now that we know how to evaluate a policy, it is time to improve it. Policy iteration is a basic and simple algorithm. It explicitly and iteratively tries first to reach a highly accurate estimate of the value function of the current policy, then it tries to improve the policy by maximising the probability of greedy actions as per the current value function. Evaluating the current policy fully and then improving it via policy iteration is inefficient, but it shows the fundamental ideas behind reinforcement learning. Please spend some time comprehending the code and reading the corresponding section 4.3 in the book.
-
-
-```python
-def Policy_iteration(env=randwalk(), p=None, V0=None, π0=None, γ=.99, θ=1e-3, show=False, epochs=None): 
-    
-    # env parameters
-    nS, nA, nR, rewards = env.nS, env.nA, env.nR, env.rewards_set()
-    p = dynamics(env) if p is None else np.array(p)
-
-    # policy parameters 
-    V = np.zeros(nS)     if V0 is None else np.array(V0); V[env.goals] = 0 # initial state values
-    π = np.zeros(nS,int) if π0 is None else np.array(π0); # initial **deterministic** policy 
-    Q = np.zeros((nS,nA))  # state action values storage
-    # π = randint(0,nA,nS)
-    
-    j=0
-    while True if epochs is None else j<epochs:
-        j+=1
-        # 1. Policy evaluation---------------------------------------------------
-        i=0
-        while True if epochs is None else i<epochs:
-            Δ = 0
-            i+= 1
-            for s in range(nS): 
-                if s in env.goals: continue # S not S+
-                v, V[s] = V[s], 0
-                for sn in range(nS): # S+
-                    for rn_, rn in enumerate(rewards): # get the reward rn and its index rn_
-                        V[s] += p[sn,rn_,  s, π[s]]*(rn + γ*V[sn])
-
-                Δ = max(Δ, abs(v-V[s]))
-            if Δ<θ: print('policy evaluation stopped @ iteration %d:'%i); break
-        
-        # 2. Policy improvement----------------------------------------------------
-        policy_stable=True
-        for s in range(nS):
-            if s in env.goals: continue # S not S+
-            πs = π[s]
-            for a in range(nA):
-                Q[s,a]=0
-                for sn in range(nS): # S+
-                    for rn_, rn in enumerate(rewards): # get the reward rn and its index rn_
-                        Q[s,a] += p[sn,rn_,  s,a]*(rn + γ*V[sn]) 
-            
-            π[s] = Q[s].argmax() # simple greedy step
-            if π[s]!=πs: policy_stable=False
-           
-        if policy_stable: print('policy improvement stopped @ iteration %d:'%j); break
-        if show: env.render(underhood='π', π=π)
-        
-    return π, Q
-```
-
-We can now apply policy iteration to a proper Environments. We start by a random walk and then we move into grid world.
-
-
-### 2-d Grid World MDP Examples
+### Policy Iteration on a Maze Grid World
 
 Let us try it on a slightly complex environment such as the maze.
 
 
 ```python
-env=maze()
-π = Policy_iteration(env, show=True)[0]
+π = Policy_iteration(env=maze(), show=True)[0]
 ```
-
-
     
 ![png](output_105_0.png)
     
-
-
     policy evaluation stopped @ iteration 2:
     policy improvement stopped @ iteration 16:
 
 
-## Value Iteration Algorithm
+## Value Iteration
+Our final step to fully develop the ideas of dynamic programming is to shorten the time it takes for a policy to be evaluated and improved. One simple idea we will follow here is to slightly improve the evaluation and immediately improve the policy. We do these two steps iteratively until our policy has stopped to improve. This is a very effective strategy because we do not wait until the policy is fully evaluated to improve it; we weave and interleave the two loops together in one loop. 
 
-Our final step to fully develop the ideas of dynamic programming is to shorten the time it takes for a policy to be evaluated and improved. One simple idea we will follow here is to slightly improve the evaluation and immediately improve the policy. We do these two steps iteratively until our policy has stopped to improve. This is a very effective strategy because we do not wait until the policy is fully evaluated to improve it; we weave and interleave the two loops together in one loop. Below we show this algorithm. Read section 4.4 to further your understanding of this algorithm.
+Value Iteration is a special case of Policy Iteration where policy evaluation is truncated to a single update per state. Instead of evaluating a policy to convergence, we update the value function directly:
+\[
+V(s) \leftarrow \max_a \sum_{s'} P(s' | s, a) [R(s, a, s') + \gamma V(s')]
+\]
+This is a nifty idea since we are saving on most of the policy evaluation and suffice by just one **step** of evaluation per iteration that also incorporates a policy improvement step.
+ *Bellman Optimality equation is the basis of the update used in value iteration algorithm.*
+Below we show this algorithm. 
 
+### Value Iteration Algorithm:
+\(
+\begin{array}{ll}
+\textbf{Algorithm: }  \text{Value Iteration} \\
+\textbf{Input: } \text{MDP } (S, A, P, R, \gamma), \text{ Threshold } \theta \\
+\textbf{Initialize: } V(s) \leftarrow 0, \forall s \in S \\
+\textbf{Repeat:}  \\
+\quad \Delta \leftarrow 0 \\
+\quad \textbf{For all } s \in S:  \\
+\quad \quad v \leftarrow V(s) \\
+\quad \quad V(s) \leftarrow \max_a \sum_{s'} P(s' | s, a) [R(s, a, s') + \gamma V(s')] \\
+\quad \quad \Delta \leftarrow \max(\Delta, |v - V(s)|) \\
+\textbf{Until:}  \Delta < \theta \\
+\textbf{Return:}  V^{*}(s), \forall s \in S
+\end{array}
+\)
 
+### Key Differences Between Policy Iteration and Value Iteration
+| Feature            | Policy Iteration | Value Iteration |
+|-------------------|----------------|----------------|
+| Policy Evaluation | Full evaluation | Single update |
+| Convergence Speed | Slower, but fewer iterations | Faster updates, but more iterations |
+| Computational Cost | Higher per iteration | Lower per iteration |
 
-```python
-
-def value_iteration(env=randwalk(), p=None, V0=None, γ=.99, θ=1e-4, epochs=None, show=False): 
-
-    # env parameters
-    nS, nA, nR, rewards, i = env.nS, env.nA, env.nR, env.rewards_set(), 0
-    p = dynamics(env) if p is None else np.array(p)
-
-    # policy parameters
-    V = np.zeros(nS) if V0 is None else np.array(V0); V[env.goals] = 0 # initial state values
-    Q = np.zeros((nS,nA)) # state action values storage
-
-    while True if epochs is None else i<epochs:
-        Δ = 0
-        i+= 1
-        for s in range(nS):
-            if s in env.goals: continue
-            v, Q[s] = V[s], 0
-            for a in range(nA):
-                for sn in range(nS):
-                    for rn_, rn in enumerate(rewards):            # get the reward rn and its index rn_
-                        Q[s,a] += p[sn,rn_,  s,a]*(rn + γ*V[sn])  # max operation is embedded now in the evaluation
-                        
-            V[s] = Q[s].max()                                     # step which made the algorithm more concise 
-            Δ = max(Δ, abs(v-V[s]))
-            
-        if Δ<θ: print('loop stopped @ iteration: %d , Δ = %2.f'% (i, Δ)); break
-        if show: env.render(underhood='π', π=Q.argmax(1))
-        
-    return Q
-```
-
-
-### Value Iteration on a Grid World
-
-Now that you understand the value-iteration algorithm, you can apply it on a different and more complex envornment such as the grid worlds.
-
-Let us try on a grid environment.
-
-
-```python
-env=grid()
-Q = value_iteration(env=env, show=True)
-print('optimal action for state', Q.argmax(1))
-```
-    
-![png](output_126_0.png)
-
-    loop stopped @ iteration: 10 , Δ =  0
-    optimal action for state [1 1 1 1 1 1 3 0 0 0 1 1 1 1 1 1 3 0 0 0 1 1 1 1 1 1 3 0 0 0 1 1 1 1 1 1 0
-     0 0 0 1 1 1 1 1 1 2 0 0 0 1 1 1 1 1 1 2 0 0 0 1 1 1 1 1 1 2 0 0 0 1 1 1 1
-     1 1 2 0 0 0]
-
-
-To interpret the policy we provided you with a useful function to render the environemt with its policy as shown above.
-
-As we can see the policy-iteration algorithm successfuly gave us the best policy for this simple environment.
 
 ### Value Iteration on a Windy Grid World
-Below we show the results of applying the value iteration method on a windy grid world. This is almost identical to the previous simple grid world without any obstacles, the only difference is that there is a wind blowing upwards, which shifts the agent 2 or 1 cell depending on its location. See page 130 of the book.
+Below we show the results of applying the value iteration method on a windy grid world. This is almost identical to the previous simple grid world without any obstacles, the only difference is that there is a wind blowing upwards, which shifts the agent 2 or 1 cell depending on its location. 
 
 
 ```python
-env=windy()
-Q = value_iteration(env, show=True)
+Q = value_iteration(env=windy(), show=True)
 ```
-
-
     
 ![png](output_130_0.png)
     
@@ -417,31 +221,33 @@ Let us now apply the policy-iteration on the maze env.
 
 
 ```python
-env=maze()
-policy = value_iteration(env, show=True)
-# print('optimal action for state', policy)
+policy = value_iteration(env=maze(), show=True)
 ```
-
-
-    
 ![png](output_132_0.png)
     
-
-
     loop stopped @ iteration: 14 , Δ =  0
 
 
 ## Conclusion
+
 In this lesson, we covered the main dynamic programming algorithms. We saw how evaluating a policy was extremely useful in being the key component to allowing us to improve the policy. We then developed a policy iteration algorithm which improves the policy in two main steps:
 1. a step that evaluates the policy fully to reach an accurate estimation of the action values of the current policy
 2. a step that improves the policy by adopting a greedy action. The usage of an action-value function Q(s,a) was key in allowing us to choose between actions since the state-value function V(s) does not differentiate between the values of actions
 
 We finally saw how the value-iteration algorithm has a similar structure to the policy-iteration algorithm with one important difference; it can arrive at an optimal policy by just taking a step *towards* the optimal policy by slightly refines its estimation of the action-value function without fully evaluating it.  Hence, it improves its policy more concisely and with much less overhead than the full policy iteration method.
 
+In summary:
+
+- **Policy Evaluation** computes \( V^{\pi} \) for a fixed policy.
+- **Policy Improvement Theorem** ensures that improving a policy results in a better policy.
+- **Policy Iteration** alternates between evaluation and improvement until convergence.
+- **Value Iteration** updates values directly, skipping full policy evaluation.
+
+These techniques form the foundation of solving MDPs using Dynamic Programming.
 In the next lesson, we will take a different approach and move to cover sampling methods that do not use the dynamics of the environment explicitly and instead try to improve its policy by interacting with the environment.
 
 **Further Reading**:
-For further reading you can consult chapter 4 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf).
+For further reading you can refer to chapter 4 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf).
 
 
 ## Your turn

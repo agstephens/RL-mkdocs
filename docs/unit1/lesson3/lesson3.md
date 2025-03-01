@@ -381,7 +381,7 @@ The **Markov Decision Process (MDP)** framework models decision-making problems 
 
 
 **Further Reading**:
-For further info refer to chapter 3 of the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf). 
+For further info please refer to chapter 3 of the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf). 
 
 
 ## Your turn
