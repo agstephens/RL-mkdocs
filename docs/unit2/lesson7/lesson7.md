@@ -256,7 +256,7 @@ Vision is possibly the most valuable sense humans have. Studies by Harvard psych
 
 
 ## Your turn:
-Follow [Worksheet7](worksheet7.md) to understand how to deal with ros2 programatically.
+Follow [Worksheet7](worksheet7.md) to understand how to deal with ros2 programmatically.
   <!-- [worksheet8.1](../../workseets/worksheet8.1.ipynb)
 
   [worksheet8.2](../../workseets/worksheet8.2.ipynb) -->

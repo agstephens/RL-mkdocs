@@ -658,9 +658,9 @@ We have further used TD update in a few control algorithms. Most notable are the
 
 
 **Further Reading**:
-For further reading you can consult chapter 6 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf).
+For further reading you refer chapter 6 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf).
 
 
 ## Your turn
-Now it is time to experiemnt further and interact with code in [worksheet8](../../workseets/worksheet8.ipynb).
+Now it is time to experiment further and interact with code in [worksheet8](../../workseets/worksheet8.ipynb).
 

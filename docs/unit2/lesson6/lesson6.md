@@ -463,4 +463,4 @@ For further reading you can consult chapter 5 from the Sutton and Barto [book](h
 
 
 ## Your turn
-Now it is time to experiemnt further and interact with code in [worksheet6](../../workseets/worksheet6.ipynb).
+Now it is time to experiment further and interact with code in [worksheet6](../../workseets/worksheet6.ipynb).

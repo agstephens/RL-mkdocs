@@ -11,8 +11,6 @@ Please note that you will need permission from the author to use the code for re
 3. understand that intermediate n values usually works the best 
 4. generalise n-step prediction methods to n-step control methods
 
-**Reading**:
-The accompanying reading of this lesson is **chapter 7** of our text book available online [here](http://incompleteideas.net/book/RLbook2020.pdf). Please note that we explain the ideas of this topic from a practical perspective and not from a theoretical perspective which is already covered in the textbook.
 
 In the previous lesson, we saw how a TD update rule defined in terms of the next reward and state as the target can effectively converge to useful state and action-value functions. It took the form:
 
@@ -44,56 +42,9 @@ $V_{t+n}(S_{t}) = V_{t+n-1}(S_{t}) + \alpha[G_{t:t+n} - V_{t+n-1}(S_{t}) ]$
 
 
 
-```python
-%matplotlib inline
-```
+## MRP for multi-steps
 
-
-```python
-from rl.rl import *
-```
-
-
-<style>.container {width:90% !important}</style>
-
-
-## Adjusting an MRP class
-
-First, let us develop our MRP class to accommodate waiting for n-1 steps before obtaining the $G_{t:t+n}$. In each step, we must also create a G function to obtain the $G_{t:t+n}$. Finally, we would need to alter our stopping criteria to wait for extra n-1 steps at the end to ensure we update the latest n-1 state values since we are always lagging n-1 steps during the episode.
-
-
-```python
-class MRP(MRP):
-    
-    def __init__(self, n=1, **kw):
-        super().__init__(**kw)
-        self.n = n
-
-    #----------------------------------- 🐾steps as per the algorithm style --------------------------
-    def stop_ep(self, done):
-        return self.stop_(done) or (self.t+1 >= self.max_t-1 and self.store)
-
-    def stop_(self,done):
-        if done:
-            self.skipstep +=1                     # holds the count for how many steps after ep is finished (will reach n-1)
-            if self.skipstep == self.n: 
-                self.t = self.t+1 - self.skipstep # returns t to its original actual count of number of steps.  it is executed before self.t+=1 in interact and hence +1 is necessary
-                self.skipstep = 0
-                return True
-            return False
-    
-        self.skipstep = 0
-        return False
-    #-----------------------------------💰 returns --------------------------------------------------
-    def G(self, τ1, τn):    # n-steps return, called during an episode   
-        
-        #if self.γ==1: return self.r[τ1:τn+1].sum() # this saves computation when no dsicount is applied
-        Gn = 0
-        for t in range(τn, τ1-1, -1): # yields τn-τ1= (τ+n)-(τ+1)= n-1 setps
-            Gn = self.γ*Gn + self.r[t] 
-            
-        return Gn 
-```
+Our MRP class already accommodate waiting for n-1 steps before obtaining the $G_{t:t+n}$. In each step, it update G to obtain the $G_{t:t+n}$. Its stopping criteria waits for extra n-1 steps at the end to ensure we update the latest n-1 state values since we are always lagging n-1 steps during the episode.
 
 ## Online TDn 
 Now we write our TDn class. It is very similar to TD except that we replace the rn+V[t+1] by the $G_{t:t+n}$. Also as long as the agent did do enough steps (n-1) we skip without doing the update.
@@ -103,9 +54,7 @@ Now we write our TDn class. It is very similar to TD except that we replace the 
 class TDn(MRP):
     
     def init(self):
-        self.store = True # there is a way to save storage by using t%(self.n+1) but we left it for clarity
-
-    
+        self.store = True 
     # ----------------------------- 🌖 online learning ----------------------    
     def online(self,*args):
         τ = self.t - (self.n-1);  n = self.n
@@ -127,56 +76,18 @@ Let us now apply TDn on our simple 5-steps random walk problem.
 
 
 ```python
-np.random.seed(0)
-TDnwalk = TDn(env=randwalk(), v0=0, α=.05, n=4, episodes=100, **demoV()).interact()
-```
-
-
-    
+TDnwalk = TDn(env=randwalk(), v0=0, α=.05, n=4, episodes=100, seed=0, **demoV()).interact()
+```  
 ![png](output_13_0.png)
     
 
 
 
 ```python
-np.random.seed(0)
-TDnwalk = TDn(env=randwalk(), v0=0, α=.05, n=1, episodes=100, **demoV()).interact()
-```
-
-
-    
+TDnwalk = TDn(env=randwalk(), v0=0, α=.05, n=1, episodes=100, seed=0, **demoV()).interact()
+``` 
 ![png](output_14_0.png)
     
-
-
-
-```python
-TDnwalk.t
-```
-
-
-
-
-    18
-
-
-
-
-```python
-TDnwalk.Ts
-```
-
-
-
-
-    array([ 3,  7,  9, 15, 11,  5,  3,  5, 13, 27,  9,  3, 11,  3, 11,  7,  7,
-            7, 13,  3,  7,  5, 15,  7,  5, 13,  3, 23, 13,  9,  3,  7,  9, 17,
-           13, 17,  9, 13,  9,  3,  3, 29,  3, 15,  7,  3,  3, 19,  9,  3, 15,
-            3,  3,  3, 19,  3, 15,  3,  3,  9,  5,  3,  3,  7,  3,  3,  3,  5,
-            3, 11,  7, 11,  3,  5,  9,  5,  3, 19,  5,  9,  5,  3,  5,  3,  5,
-            3,  3,  9, 11,  9,  7,  5,  9,  7,  9,  3,  3, 15,  7, 19],
-          dtype=uint32)
-
 
 
 ### TDn and MC Runs on random walk
@@ -202,27 +113,12 @@ def nstepTD_MC_randwalk(env=randwalk(), algorithm=TDn, alglabel='TD'):
         MCs = Runs(algorithm=MC(env=env,α=α, v0=.5),  runs=100, plotE=True).interact(label='MC α= %.2f'%α, frmt='--')
 ```
 
-Note that 5 states random walk environment env=randwalk() is the default environment for MRPs and s we did not need to explicitly pass it in the above.
+Note that 5 states random walk environment env=randwalk() is the default environment for MRPs so we did not need to explicitly pass it in the above.
 
 
 ```python
 nstepTD_MC_randwalk()
-```
-
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-
-
-
-    
+```  
 ![png](output_21_1.png)
     
 
@@ -262,22 +158,7 @@ def nstepTD_MC_randwalk_αcompare(env=randwalk_(), algorithm=TDn, Vstar=None, ru
 figure_7_2 = nstepTD_MC_randwalk_αcompare
 figure_7_2()
 ```
-
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-
-
-
-    
+  
 ![png](output_24_1.png)
     
 
@@ -316,106 +197,11 @@ class TDnf(MRP):
 
 ```python
 TDnwalk = TDnf(env=randwalk(), v0=0, α=.1, n=4, episodes=100, seed=0, **demoV()).interact()
-```
-
-
-    
+```   
 ![png](output_28_0.png)
     
 
-
-
-```python
-TDnwalk.t
-```
-
-
-
-
-    18
-
-
-
-
-```python
-TDnwalk.Ts
-```
-
-
-
-
-    array([ 3,  7,  9, 15, 11,  5,  3,  5, 13, 27,  9,  3, 11,  3, 11,  7,  7,
-            7, 13,  3,  7,  5, 15,  7,  5, 13,  3, 23, 13,  9,  3,  7,  9, 17,
-           13, 17,  9, 13,  9,  3,  3, 29,  3, 15,  7,  3,  3, 19,  9,  3, 15,
-            3,  3,  3, 19,  3, 15,  3,  3,  9,  5,  3,  3,  7,  3,  3,  3,  5,
-            3, 11,  7, 11,  3,  5,  9,  5,  3, 19,  5,  9,  5,  3,  5,  3,  5,
-            3,  3,  9, 11,  9,  7,  5,  9,  7,  9,  3,  3, 15,  7, 19],
-          dtype=uint32)
-
-
-
-
-```python
-TDnwalk = TDnf(env=randwalk(), v0=0, α=.1, n=4, episodes=100, seed=0, **demoV()).interact()
-```
-
-
-    
-![png](output_31_0.png)
-    
-
-
-
-```python
-TDnwalk.t
-```
-
-
-
-
-    18
-
-
-
-
-```python
-TDnwalk.Ts
-```
-
-
-
-
-    array([ 3,  7,  9, 15, 11,  5,  3,  5, 13, 27,  9,  3, 11,  3, 11,  7,  7,
-            7, 13,  3,  7,  5, 15,  7,  5, 13,  3, 23, 13,  9,  3,  7,  9, 17,
-           13, 17,  9, 13,  9,  3,  3, 29,  3, 15,  7,  3,  3, 19,  9,  3, 15,
-            3,  3,  3, 19,  3, 15,  3,  3,  9,  5,  3,  3,  7,  3,  3,  3,  5,
-            3, 11,  7, 11,  3,  5,  9,  5,  3, 19,  5,  9,  5,  3,  5,  3,  5,
-            3,  3,  9, 11,  9,  7,  5,  9,  7,  9,  3,  3, 15,  7, 19],
-          dtype=uint32)
-
-
-
-### TDf and TDnf for n=1
-
-
-```python
-TDnwalk = TDf(env=randwalk_(), v0=0, α=.8, episodes=10, seed=0, **demoV()).interact()
-```
-
-
-    
-![png](output_35_0.png)
-    
-
-
-
-```python
-TDnwalk = TDnf(env=randwalk_(), v0=0, α=.8, n=1, episodes=10, seed=0, **demoV()).interact()
-```
-
-
-    
-![png](output_36_0.png)
+Note that TDf == TDnf for n=1
     
 
 
@@ -426,32 +212,9 @@ Let us now  see how a TDnf for n=1 and n=5 as well as MC behaves on our usual 5-
 ```python
 nstepTD_MC_randwalk(algorithm=TDnf, alglabel='TDf')
 ```
-
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-    100%|[90m██████████████████████████████████████████████████████████████████████████████████████████[0m|100/100
-
-
-
-    
 ![png](output_38_1.png)
     
-
-
 Let us now double check that both TDnf and TDf are identical for n=1.
-
-
-```python
-from tqdm import trange, tqdm
-```
-
 
 ```python
 αs = np.arange(0,1.05,.1)
@@ -461,14 +224,7 @@ compareTDf = Compare(algorithm=TDf(env=randwalk_(), v0=0, episodes=10), runs=2, 
 
 compareTDnf = Compare(algorithm=TDnf(env=randwalk_(), v0=0, n=n, episodes=10), runs=2, hyper={'α':αs}, 
                       plotE=True).compare(label='TDn offline n=%d'%n)
-```
-
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|11/11
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|11/11
-
-
-
-    
+```  
 ![png](output_41_1.png)
     
 
@@ -479,23 +235,7 @@ Let us now compare how offline n-step TD (TDnf) performs with different values f
 
 ```python
 nstepTD_MC_randwalk_αcompare(algorithm=TDnf, alglabel='offline TD')
-```
-
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-    100%|[92m██████████████████████████████████████████████████████████████████████████████████████████[0m|32/32
-
-
-
-    
+``` 
 ![png](output_43_1.png)
     
 
@@ -527,80 +267,30 @@ class Sarsan(MDP(MRP)):
         
         # n steps τ+1,..., τ+n inclusive of both ends
         self.Q[sτ,aτ] += self.α*(self.G(τ1,τn) + (1- done)*self.γ**n *self.Q[sn,an] - self.Q[sτ,aτ])
-```
+```    
 
-
-```python
-nsarsa = Sarsan(env=grid(), n=10, α=.4, episodes=50, seed=0,  **demoQ()).interact()
-```
-
-
-    
-![png](output_47_0.png)
-    
-
-
-
-```python
-for seed in range(100):
-    nsarsa = Sarsan(env=grid(), α=.4, seed=seed, episodes=1).interact()
-    if len(nsarsa.env.trace) <15: print(seed)
-```
-
-    16
-    47
-
-
-
-```python
-def figure_7_4(n=5,seed=16): 
-    
-    # draw the path(trace) that the agent took to reach the goal
-    nsarsa = Sarsan(env=grid(), α=.4, seed=seed, episodes=1).interact()
-    nsarsa.env.render(underhood='trace', subplot=131, animate=False, label='path of agent')
-
-    # now draw the effect of learning to estimate the Q action-value function for n=1
-    nsarsa = Sarsan(env=grid(), α=.4, seed=seed, episodes=1, underhood='maxQ').interact() 
-    nsarsa.render(subplot=132, animate=False, label='action-value increassed by 1-steps Sarsa\n')
-    
-    #n=5 # try 10
-    # now draw the effect of learning to estimate the Q action-value function for n=10
-    nsarsa = Sarsan(env=grid(), n=n, α=.4, seed=seed, episodes=1, underhood='maxQ').interact()    
-    nsarsa.render(subplot=133, animate=False, label='action-value increassed by %d-steps Sarsa\n'%n)
-
-figure_7_4(n=3)
-```
-
-
-    
-![png](output_49_0.png)
-    
-
-
+Let us compare Sarsa and Sarsan performances on the same problem with the same reward.
 
 ```python
 sarsa = Sarsa(env=maze(reward='reward1'),  α=.2, episodes=100, seed=10, **demoQ()).interact()
-# sarsa = Sarsan(env=maze(reward='reward1'), n=1, α=.2, episodes=100, seed=10, **demoQ()).interact() # same as above
-```
-
-
-    
+``` 
 ![png](output_50_0.png)
     
 
 
-
 ```python
 sarsa = Sarsan(env=maze(reward='reward1'), n=10,  α=.2, episodes=100, seed=10, **demoQ()).interact()
-```
-
-
-    
+``` 
 ![png](output_51_0.png)
     
 
 
-Note how the agent reaches a better policy in less number of episodes, i.e. it converges faster when using n-step method. At the end it counted a extra n-1 steps to finish the set of n-1 updates needed at the end of the episode.
+Note how the agent reaches a better policy in less number of episodes, i.e. it converges faster when using n-step method. At the end it counted an extra n-1 steps to finish the set of n-1 updates needed at the end of the episode.
+
+To further show the effect of multi-step, we show below how an agent policy is affected when by considering 1-step and 3-steps rewards.
+
+    
+![png](output_49_0.png)
 
 ## n-step Q-learning
 Can we implement an n-step Q-learning algorithm?
@@ -619,11 +309,9 @@ Finally, we can blend the importance sampling with expectation using a hyperpara
 ## Conclusion
 In this lesson, we have covered the n-step TD algorithms for prediction and control. We have seen how the different values of n represent a trade-off between full bootstrapping, as in the one-step TD (n=1), and no bootstrapping, as in the Monte Carlo algorithm (n=T the number of steps in an episode). Intermediate n values give algorithms that lie within the two extremes of the spectrum of bootstrapping algorithms. We also find that the best value is usually an intermediate value >1. As we have seen, creating such an algorithm is challenging and has its drawbacks in terms of implementation. In later lessons, we will see how to achieve similar results without waiting or counting steps. We will adopt a bootstrapping variation mechanism which turns the n-step countable mechanism into an infinite continuum of value by adopting the $\lambda$ hyperparameter that takes a real value instead of integers.
 
+**Further Reading**:
+For further reading you refer chapter 7 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf).
+
+
 ## Your turn
-1. implement the incorrect n-step Q-learning and apply it on the maze problem and see how it performs.
-2. implement n-step Expected Sarsa and compare its performance with the n-step Sarsa.
-
-
-## Challenge
-Try to implement the correct off-policy n-step Sarsa presented in page 149 of the textbook.
-
+Now it is time to experiment further and interact with code in [worksheet9](../../workseets/worksheet9.ipynb).
