@@ -412,15 +412,21 @@ For algorithms like **Value Iteration**, it is important that the MDP is **irred
 
 ## The Bellman Equations
 
-The **Bellman equations** provide recursive relationships between the value of a state (or state-action pair) and the values of neighboring states. These equations are fundamental in solving MDPs and are the basis for many reinforcement learning algorithms.
-
-<!-- ### Bellman Equation for the Value Function -->
+The Bellman equations provide recursive relationships between the value of a state (or state-action pair) and the values of neighboring states. These equations are fundamental in solving MDPs and are the basis for many reinforcement learning algorithms.
 
 The **value function** \( V_{\pi}(s) \) represents the expected return starting from state \( s \) and following policy \( \pi \). The Bellman equation for \( V_{\pi}(s) \) is:
 
 \[
-V_{\pi}(s) = \mathbb{E}_{\pi}\left[ r(s, a, s') + \gamma \sum_{s'} p(s' | s, a) V_{\pi}(s') \right]
+V^\pi(s) = \mathbb{E}_\pi \left[ R_{t+1} + \gamma V^\pi(S_{t+1}) \mid S_t = s \right]
 \]
+
+By unfolding the expectation operator with the help of the dynamics and the policy \(\pi\) we have:
+
+\[
+V^\pi(s) = \sum_{a} \pi(a \mid s) \sum_{s', r} p(s', r \mid s, a) \left[ r + \gamma V^\pi(s') \right]
+\]
+
+This equation expresses the expected value of a state under a policy \(\pi\) by summing over all actions \(a\), next states \(s'\) and rewards \(r\), weighted by their respective probabilities.
 
 Where:
 - \( V_{\pi}(s) \) is the value of state \( s \) under policy \( \pi \),
@@ -428,13 +434,18 @@ Where:
 - \( \gamma \) is the discount factor, and
 - \( p(s' | s, a) \) is the transition probability.
 
-<!-- ### Bellman Equation for the Q-Function -->
-
 The **Q-function** \( Q_{\pi}(s, a) \) represents the expected return after taking action \( a \) in state \( s \) and then following policy \( \pi \). The Bellman equation for \( Q_{\pi}(s, a) \) is:
 
 \[
-Q_{\pi}(s, a) = \mathbb{E}\left[ r(s, a, s') + \gamma \sum_{s'} p(s' | s, a) V_{\pi}(s') \right]
+Q^\pi(s, a) = \mathbb{E}_\pi \left[ R_{t+1} + \gamma Q^\pi(S_{t+1}, A_{t+1}) \mid S_t = s, A_t = a \right]
 \]
+
+By incorporating the expectation over the policy \(\pi\)for future actions, we get:
+
+\[
+Q^\pi(s, a) = \sum_{s', r} p(s', r \mid s, a) \left[ r + \gamma \sum_{a'} \pi(a' \mid s') Q^\pi(s', a') \right]
+\]
+
 
 Where:
 - \( Q_{\pi}(s, a) \) is the action-value function,
@@ -449,20 +460,24 @@ Where:
 
 The **Bellman optimality equations** describe the relationship between the optimal value function \( V^*(s) \) or the optimal Q-function \( Q^*(s, a) \) and the transition and reward dynamics. These equations are used to compute the optimal policy that maximizes the expected return.
 
-
-
 \[
-    V^*(s) = \max_a \mathbb{E}\left[ r(s, a, s') + \gamma \sum_{s'} p(s' | s, a) V^*(s') \right]
+V_*(s) = \max_{a} \mathbb{E} \left[ R_{t+1} + \gamma V_*(S_{t+1}) \mid S_t = s, A_t = a \right]
 \]
 
-
 \[
-    Q^*(s, a) = \mathbb{E}\left[ r(s, a, s') + \gamma \sum_{s'} p(s' | s, a) \max_{a'} Q^*(s', a') \right]
+Q_*(s, a) = \mathbb{E} \left[ R_{t+1} + \gamma \max_{a'} Q_*(S_{t+1}, a') \mid S_t = s, A_t = a \right]
 \]
 
-Where:
-- \( V^*(s) \) is the optimal value function,
-- \( Q^*(s, a) \) is the optimal Q-function,
+By substituting for the expectation operator, we have:
+
+\[
+V_*(s) = \max_{a} \sum_{s', r} p(s', r \mid s, a) \left[ r + \gamma V_*(s') \right]
+\]
+
+\[
+Q_*(s, a) = \sum_{s', r} p(s', r \mid s, a) \left[ r + \gamma \max_{a'} Q_*(s', a') \right]
+\]
+
 - The **max** operator ensures that the agent chooses the action \( a \) that maximizes the expected return.
 
 
@@ -486,7 +501,7 @@ You can adjust the video settings in SharePoint (speed up to 1.2 and reduce the 
 
 Ok, so now we are ready to tackle the practicals, please go ahead and download the worksheet and run and experiement with the provided code to build some grid world environments and visualise them and make a simple robot agent takes some steps/actions within these environments!.
 
-You will need to download a python library (Grid.py) that we bespokley developed to help you run RL algorithms on toy problems and be abel to easily visualise them as needed, the code is optimised to run efficiently and you will be able to use these environmnets to test different RL algorithms extensively. Please place the library in the same directory of the worksheet. In general it would be a good idea to place all worksheets and libraries provided in one directory. This will make importing and runing code easier and more streamlined.
+You will need to download a python library (grid.py) that we bespokley developed to help you run RL algorithms on toy problems and be abel to easily visualise them as needed, the code is optimised to run efficiently and you will be able to use these environmnets to test different RL algorithms extensively. Please place the library in the same directory of the worksheet. In general it would be a good idea to place all worksheets and libraries provided in one directory. This will make importing and runing code easier and more streamlined.
 
 
 

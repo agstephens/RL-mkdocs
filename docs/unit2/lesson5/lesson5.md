@@ -117,9 +117,11 @@ Note that $\gamma$ must be $< 1$ to guarantee convergence of the Bellman equatio
 
 ## Policy Improvement Theorem
 The **Policy Improvement Theorem** states that if for all states:
+
 \[
 Q_{\pi}(s, a^*) > V_{\pi}(s)
 \]
+
 where \( a^* = \arg\max_a Q_{\pi}(s, a) \), then choosing \( a^* \) instead of the action dictated by \( \pi \) results in a strictly better policy. This theorem justifies **Policy Iteration**.
 
 Based on this important theorem, we can then devise an algorithm that improve our policy. A natural way to do this to first evaluate the current policy then improve it, then evaluate the improved policy and then improve it, and so on until the policy stabilise which means we reached an optimal policy that cannot be improved any more. This idea of *iteratively* improving the policy constitute the base for two algorithms that we cover, Policy Iteration and Value Iteration.
@@ -131,9 +133,9 @@ Policy Iteration is an iterative process to find the optimal policy \( \pi^* \).
 
 1. **Policy Evaluation:** Compute \( V^{\pi} \) using the policy evaluation algorithm.
 2. **Policy Improvement:** Improve the policy by acting greedily with respect to \( V^{\pi} \):
-   \[
+   \(
    \pi'(s) = \arg\max_a \sum_{s'} P(s' | s, a) [R(s, a, s') + \gamma V(s')]
-   \]
+   \)
 3. Repeat until \( \pi \) converges to \( \pi^* \).
 
 So as you can see the policy improvement step is based on *Bellman Optimality equation*.

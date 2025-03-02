@@ -36,44 +36,48 @@ We will then move to Policy Gradient methods that directly estimate a useful pol
 We start by assuming that the policy is fixed. This will help us develop an algorithm that predicts the state space's value function (expected return). Then we will move to the policy improvement methods, i.e. these methods that help us to compare and improve our policy with respect to other policies and move to a better policy when necessary. Then we move to the control case (policy iteration methods).
 
 
-# Monte Carlo Methods in Reinforcement Learning
+<!-- ## Monte Carlo Methods -->
 
-## 1. Introduction
 
-Monte Carlo (MC) methods in Reinforcement Learning (RL) are a class of algorithms used to estimate value functions and optimize policies by using **sampled episodes** instead of full models of the environment. Unlike Dynamic Programming (DP), which requires a known transition model \( P(s' | s, a) \), Monte Carlo methods learn **directly from experience** by averaging observed rewards.
 
-## 2. Background: From Bellman Equations to Monte Carlo
 
-### 2.1 Bellman Equations
+### Bellman Equations(reminder)
 
-The Bellman equations form the foundation of many RL methods. They define the relationship between the value of a state and the values of successor states.
 
-For a given **policy** \( \pi \), the **Bellman Equation for the state-value function** is:
+As we have seen in a previous lesson, the Bellman equations form the foundation of many RL methods. They define the relationship between the value of a state and the values of successor states.
 
-\[
-V^\pi(s) = \mathbb{E}_\pi \left[ R(s, a) + \gamma V^\pi(s') \right]
-\]
+For a given policy \( \pi \), the Bellman Equation for the state-value function is:
 
-For the **action-value function** \( Q^\pi(s, a) \):
+$$
+V^\pi(s) = \mathbb{E}_\pi \left[ R_{t+1} + \gamma V^\pi(S_{t+1}) \mid S_t = s \right]
+$$
 
-\[
-Q^\pi(s, a) = \mathbb{E}_\pi \left[ R(s, a) + \gamma Q^\pi(s', a') \right]
-\]
+For the action-value function \( Q^\pi(s, a) \):
 
-### 2.2 Dynamic Programming (DP) and its Limitations
+$$
+Q^\pi(s, a) = \mathbb{E}_\pi \left[ R_{t+1} + \gamma Q^\pi(S_{t+1}, A_{t+1}) \mid S_t = s, A_t = a \right]
+$$
 
-**Dynamic Programming (DP)** uses these equations to iteratively compute value functions and policies using two key steps:
+### Dynamic Programming is Model based
 
-1. **Policy Evaluation**: Solve the Bellman equation for a given policy.
-2. **Policy Improvement**: Use the Bellman optimality equation to update the policy.
+As we have seen in the last lesson, Dynamic Programming uses Bellman equations as update rules to iteratively compute value functions and policies using two key steps:
 
-However, **DP has a major limitation**: it requires complete knowledge of the transition model \( P(s' | s, a) \), which is often unavailable in real-world scenarios.
+1. **Policy Evaluation**: Uses the Bellman equation to obtain an evaluation for a given policy.
+2. **Policy Improvement**: Uses the Bellman optimality equation to update the policy towards a better policy.
 
-## 3. Monte Carlo Methods: A Model-Free Alternative
+However, DP has a major limitation: it requires complete knowledge of the dynamics model \( p(s',r | s, a) \), or transition model \( p(s'| s, a) \) which is often unavailable in real-world scenarios. In other words, it is a model-based methods.
 
-Monte Carlo (MC) methods **do not require a transition model**. Instead, they estimate value functions using **sampled episodes** of experience. The key idea is to compute value functions based on **returns** observed over multiple episodes.
+## Monte Carlo: Model-Free Methods
 
-### 3.1 Return Definition
+Monte Carlo (MC) methods are a class of RL algorithms used to estimate value functions and optimise policies by using **sampled episodes** instead of full models of the environment. Unlike Dynamic Programming (DP), which requires a known dynamics model \( p(s',r | s, a) \), Monte Carlo methods learn **directly from experience** by averaging observed rewards.
+
+Monte Carlo (MC) methods estimate value functions without requiring a dynamics model. Instead, they rely on sampled episodes of experience. The key idea is to approximate value functions by averaging observed returns over multiple episodes.
+
+The fundamental principle behind MC methods is that averaging samples from a distribution approximates its expectation. Since state-value and action-value functions are defined as expected returns, averaging returns over a sufficiently large number of episodes provides a reliable estimate of these functions.
+
+There are some technical conditions that must be met for this approximation to hold, which we will reference when necessary.
+
+<!-- ### Return Definition -->
 
 For an episode consisting of states, actions, and rewards:
 
@@ -81,15 +85,21 @@ For an episode consisting of states, actions, and rewards:
 G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \dots
 \]
 
-The **Monte Carlo estimate** of \( V(s) \) is the average return from all episodes where state \( s \) was visited.
+The Monte Carlo estimate of \( V(s) \) is the average return from all episodes where state \( s \) was visited.
 
 \[
 V(s) \approx \frac{1}{N} \sum_{i=1}^{N} G_i(s)
 \]
 
-## 4. Important Monte Carlo Algorithms
+Where:
 
-### 4.1 First-Visit Monte Carlo Policy Evaluation
+- $i$ refers to the index over the episodes, not the time steps.
+- \(G_i(s)\) is the return (sum of discounted rewards) observed from episode $i$, starting at state $s$.
+- $N$ is the total number of episodes used to average the returns.
+
+<!-- ## 4. Important Monte Carlo Algorithms -->
+
+## First-Visit Monte Carlo Policy Evaluation
 
 First-visit MC estimates the value of a state by averaging returns from the **first time** that state is encountered in each episode.
 
@@ -97,14 +107,14 @@ First-visit MC estimates the value of a state by averaging returns from the **fi
 V(s) \leftarrow \frac{1}{N} \sum_{i=1}^{N} G_i(s)
 \]
 
-#### Algorithm:
+<!-- ### Algorithm: -->
 
-\[
+\(
 \begin{array}{ll}
-\textbf{Algorithm:} & \text{First-Visit Monte Carlo Policy Evaluation} \\
-\textbf{Input:} & \text{Episodes generated under policy } \pi \\
-\textbf{Initialize:} & V(s) \leftarrow 0, N(s) \leftarrow 0, \forall s \in S \\
-\textbf{For each episode:} & \\
+\textbf{Algorithm: }  \text{First-Visit Monte Carlo Policy Evaluation} \\
+\textbf{Input: } \text{Episodes generated under policy } \pi \\
+\textbf{Initialize: }  V(s) \leftarrow 0, N(s) \leftarrow 0, \forall s \in S \\
+\textbf{For each episode: } & \\
 \quad \text{Generate an episode: } (s_1, a_1, r_2, s_2, \dots, s_T) & \\
 \quad G \leftarrow 0 & \\
 \quad \textbf{For each step t from T to 1:} & \\
@@ -112,63 +122,12 @@ V(s) \leftarrow \frac{1}{N} \sum_{i=1}^{N} G_i(s)
 \quad \quad \text{If } s_t \text{ appears first in the episode:} & \\
 \quad \quad \quad N(s_t) \leftarrow N(s_t) + 1 & \\
 \quad \quad \quad V(s_t) \leftarrow V(s_t) + \frac{1}{N(s_t)}(G - V(s_t)) & \\
-\textbf{Return:} & V(s), \forall s \in S \\
+\textbf{Return: } V(s), \forall s \in S \\
 \end{array}
-\]
+\)
 
 ---
 
-### 4.2 Monte Carlo Control with \(\epsilon\)-Greedy Exploration
-
-To optimize policies, we extend MC to **control**, using the **Generalized Policy Iteration (GPI)** framework. The key idea is:
-
-1. **Policy Evaluation:** Estimate \( Q^\pi(s, a) \) using MC.
-2. **Policy Improvement:** Use an **\(\epsilon\)-greedy** strategy to gradually improve the policy.
-
-#### Algorithm:
-
-\[
-\begin{array}{ll}
-\textbf{Algorithm:} & \text{Monte Carlo Control with } \epsilon \text{-greedy policy} \\
-\textbf{Initialize:} & Q(s, a) \leftarrow 0, N(s, a) \leftarrow 0, \forall s, a \\
-\textbf{For each episode:} & \\
-\quad \text{Generate an episode using } \pi_{\epsilon} & \\
-\quad G \leftarrow 0 & \\
-\quad \textbf{For each step t from T to 1:} & \\
-\quad \quad G \leftarrow \gamma G + r_{t+1} & \\
-\quad \quad \text{If } (s_t, a_t) \text{ appears first in episode:} & \\
-\quad \quad \quad N(s_t, a_t) \leftarrow N(s_t, a_t) + 1 & \\
-\quad \quad \quad Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \frac{1}{N(s_t, a_t)}(G - Q(s_t, a_t)) & \\
-\quad \quad \text{Update policy } \pi \text{ using } \epsilon \text{-greedy:} & \\
-\quad \quad \quad \pi(s) \leftarrow \arg\max_a Q(s, a) \text{ with probability } (1-\epsilon) & \\
-\quad \quad \quad \text{Choose random action with probability } \epsilon & \\
-\textbf{Return:} & Q(s, a), \pi(s) \forall s, a \\
-\end{array}
-\]
-
----
-
-## 5. Advantages and Limitations of Monte Carlo Methods
-
-### **Advantages**
-✅ Model-free: No need to know the environment’s transition probabilities.  
-✅ Simple and intuitive: Works by averaging sampled returns.  
-✅ Works well for episodic tasks.  
-
-### **Limitations**
-❌ Requires **complete episodes**, which may not always be feasible.  
-❌ Convergence can be slow compared to Temporal-Difference (TD) methods.  
-
----
-
-## 6. Conclusion
-
-Monte Carlo methods provide a powerful alternative to Dynamic Programming for RL problems where the environment’s transition model is unknown. They estimate value functions from sampled episodes and improve policies using exploration strategies like \(\epsilon\)-greedy.
-
-- **Policy Evaluation**: Use MC to estimate state values.
-- **Policy Control**: Improve policies using MC-based action-value estimates.
-
-Next steps involve combining MC with **Temporal-Difference (TD) learning**, leading to advanced methods like **SARSA** and **Q-learning**.
 
 
 ## First visit MC Policy-evaluation (prediction) 
@@ -419,6 +378,34 @@ mcc = MC1stControl(env=grid(reward='reward_1'), γ=.97, episodes=100, ε=0.9, d�
 
 ## Incremental constant-α MC: Every-visit MC Prediction
 
+### Monte Carlo Control with \(\epsilon\)-Greedy Exploration
+
+To optimize policies, we extend MC to **control**, using the **Generalized Policy Iteration (GPI)** framework. The key idea is:
+
+1. **Policy Evaluation:** Estimate \( Q^\pi(s, a) \) using MC.
+2. **Policy Improvement:** Use an **\(\epsilon\)-greedy** strategy to gradually improve the policy.
+
+### Algorithm:
+
+\[
+\begin{array}{ll}
+\textbf{Algorithm:} & \text{Monte Carlo Control with } \epsilon \text{-greedy policy} \\
+\textbf{Initialize:} & Q(s, a) \leftarrow 0, N(s, a) \leftarrow 0, \forall s, a \\
+\textbf{For each episode:} & \\
+\quad \text{Generate an episode using } \pi_{\epsilon} & \\
+\quad G \leftarrow 0 & \\
+\quad \textbf{For each step t from T to 1:} & \\
+\quad \quad G \leftarrow \gamma G + r_{t+1} & \\
+\quad \quad \text{If } (s_t, a_t) \text{ appears first in episode:} & \\
+\quad \quad \quad N(s_t, a_t) \leftarrow N(s_t, a_t) + 1 & \\
+\quad \quad \quad Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \frac{1}{N(s_t, a_t)}(G - Q(s_t, a_t)) & \\
+\quad \quad \text{Update policy } \pi \text{ using } \epsilon \text{-greedy:} & \\
+\quad \quad \quad \pi(s) \leftarrow \arg\max_a Q(s, a) \text{ with probability } (1-\epsilon) & \\
+\quad \quad \quad \text{Choose random action with probability } \epsilon & \\
+\textbf{Return:} & Q(s, a), \pi(s) \forall s, a \\
+\end{array}
+\]
+
 
 ```python
 class MC(MRP):
@@ -594,6 +581,25 @@ Note how exploration lead to a fully covered environment but to a slower converg
 In this lesson, we studied the properties of Monte Carlo algorithms for prediction and control. We started by covering a basic first visit MC method that averages the returns similar to what we did in lesson 1, this time for the associative problem (i.e., when we have states that we select specific actions for, un-associated problems do not have states and have been studied in lesson 1). We have then created an incremental MC algorithm that allows us to average the returns in a step-by-step manner. To that end, we have developed an essential MRP class that will carry the step-by-step and episode-by-episode interaction with an MRP environment, and then we added a useful set of visualisation routines. We have further inherited the MRP class in an MDP class that defines policies that depend on the Q function to obtain a suitable policy for an agent (i.e., control).
 We noted that MC needed to wait until the episode was finished to carry out updates. In the next unit, we will study full online algorithms that mitigate this shortcoming of MC with the cost of bootstrapping. We will be using the MRP and MDP classes that we developed here.
 
+
+Monte Carlo methods provide a powerful alternative to Dynamic Programming for RL problems where the environment’s transition model is unknown. They estimate value functions from sampled episodes and improve policies using exploration strategies like \(\epsilon\)-greedy. We covered two types of methods:
+
+- Policy Evaluation: Use MC to estimate state values.
+- Policy Control: Improve policies using MC-based action-value estimates.
+
+**Advantages**
+
+- Model-free: No need to know the environment’s transition probabilities.  
+- Simple and intuitive: Works by averaging sampled returns.  
+- Works well for episodic tasks.  
+
+**Limitations**
+
+- Requires complete episodes, which may not always be feasible.  
+- Convergence can be slow compared to Temporal-Difference (TD) methods.  
+
+
+In the next unit, we will explore Temporal-Difference (TD) learning methods, which update state-value estimates without requiring complete episodes. Instead, TD methods rely on one-step updates, much like Value Iteration incrementally improves policies. We will also introduce TD-based action-value methods for control, including SARSA and Q-learning, which use the Q action-value function to learn optimal policies.
 
 **Reading**:
 For further reading you can consult chapter 5 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf).
