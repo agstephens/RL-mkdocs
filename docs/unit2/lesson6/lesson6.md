@@ -1,6 +1,8 @@
-# Lesson 5-Tabular Methods: Monte Carlo
+# Lesson 6-Tabular Methods: Monte Carlo
 
 **Learning outcomes**
+
+By the end of this lesson, you will be able to: 
 
 1. understand the difference between learning the expected return and computing it via dynamic programming
 1. understand the strengths and weaknesses of MC methods
@@ -10,7 +12,7 @@
 1. understand how to move from prediction to control by extending the V function to a Q function and make use of the idea of generalised policy iteration-GPI
 1. understand how policy gradient methods work and appreciate how they differ from value function methods
 
-
+## Overview
 In this lesson, we develop the ideas of Monte Carlo methods. Monte Carlo methods are powerful and widely used in settings other than RL. You may have encountered them in a previous module where they were mainly used for sampling. We will also use them here to sample observations and average their expected returns. Because they average the returns, Monte Carlo methods have to wait until *all* trajectories are available to estimate the return. Later, we will find out that Temporal Difference methods do not wait until the end of the episode to update their estimate and outperform MC methods.
 
 Note that we have now moved to *learning* instead of *computing* the value function and its associated policy. This is because we expect our agent to learn from *interacting with the environment* instead of using the dynamics of the environment, which is usually hard to compute except for a simple lab-confined environment. 
@@ -18,7 +20,7 @@ Note that we have now moved to *learning* instead of *computing* the value funct
 Remember that we are dealing with *expected return*, and we are either finding an *exact solution for this expected return* as when we solve the set of Bellman equations or finding an *approximate solution for the expected return* as in DP or MC.
 Remember also that the expected return for a state is the future cumulative discounted rewards given that the agent follows a specific policy.
 
-One pivotal observation that summarises the justification for using MC methods over DP methods is that it is often the case that we are able to interact with the environment instead of obtaining its dynamics due to tractability issues.
+One pivotal observation that summarises the justification for using MC methods over DP methods is that it is often the case that we are able to interact with the environment instead of obtaining its dynamics due to its complexity and intractability. In other words, interacting with the envoronment is often more direct and easier than obtaining the model of the environment. Therefore, we say that MC are model-free methods.
 
 ## Plan
 
@@ -97,17 +99,15 @@ Where:
 - \(G_i(s)\) is the return (sum of discounted rewards) observed from episode $i$, starting at state $s$.
 - $N$ is the total number of episodes used to average the returns.
 
-<!-- ## 4. Important Monte Carlo Algorithms -->
 
-## First-Visit Monte Carlo Policy Evaluation
+## First-Visit Monte Carlo Policy Evaluation (prediction) 
+Because MC methods depend entirely on experience, a natural way to approximate the cumulative future discounted reward is by taking their average once they become available through experience. So we must collect the cumulative *future* discounted reward once this experience has elapsed. In other words, we need to take the sum *after* the agent has finished an episode for all the rewards obtained from the current state to the end of the episode. Then we average those returns over all of the available episodes. Note that MC methods only apply for episodic tasks, which is one of its limitations in addition to having to wait until the episode is finished.
 
-First-visit MC estimates the value of a state by averaging returns from the **first time** that state is encountered in each episode.
+Note also that the agent can visit the same state more than once inside the same episode. One question that arises from the above averaging is: which visit should be counted? 
 
-\[
-V(s) \leftarrow \frac{1}{N} \sum_{i=1}^{N} G_i(s)
-\]
+We can take the sum starting from the first visit, or every visit, each yields a different algorithm. The first-visit algorithm is more suitable for tabular methods, while the every-visit algorithm is more suitable when using function approximation methods (such as neural networks).
 
-<!-- ### Algorithm: -->
+One could argue that since we want to estimate the value of a state based on the full horizon of rewards obtained until the end of an episode, we should include only the *first visit of the state* in the average. This is the basis of the First-visit Monte Carlo (MC) policy evaluation method. First-visit MC estimates the value of a state by averaging the returns from the first time that state is encountered in each episode. Below we show the pseudocode for this algorithm.
 
 \(
 \begin{array}{ll}
@@ -126,184 +126,96 @@ V(s) \leftarrow \frac{1}{N} \sum_{i=1}^{N} G_i(s)
 \end{array}
 \)
 
----
 
+### Random Walk Problem
+The Random Walk problem is a simple **Markov Reward Process (MRP)** used to illustrate value estimation methods. It consists of a finite, linear chain of states, where an agent moves randomly left or right until reaching one of the two terminal states.
 
+#### Problem Setup
+- Typically, there are five non-terminal states labeled \( A, B, C, D, E \) on a 1-d grid world. Another variaiton use 21 states.
+- Two terminal states exist at both ends.
+- The agent starts in the center and moves *randomly* left or right with equal probability.
+- The episode ends when the agent reaches a terminal state.
+- A *reward of +1* is received upon reaching the right terminal state, while the left terminal state gives *0 reward*.
+<!-- - The discount factor \( \gamma \) is used to determine state values. -->
 
-## First visit MC Policy-evaluation (prediction) 
-Value-function approximation Method
+This random walk problem is often used to demonstrate **Monte Carlo** and **Temporal-Difference (TD)** learning methods for estimating state-value function. Below we show this problem.
 
-Because MC methods depend entirely on experience, a natural way to approximate the cumulative future discounted reward is by taking their average once they become available through experience. So we must collect the cumulative *future* discounted reward once this experience has elapsed. In other words, we need to take the sum *after* the agent has finished an episode for all the rewards obtained from the current state to the end of the episode. Then we average those returns over all of the available episodes. 
+![png](output_9_0.png)  
+  
+            A     B     C     D     E
 
-Note that MC methods only apply for episodic tasks, which is one of its limitations in addition to having to wait until the episode is finished.
+Let’s now run MC1st with a useful visualization. The plot displays the true state values of the random walk as black points connected by a black line. The agent’s estimated values are represented by blue points and a blue line, allowing us to visually assess how closely the learned values for states A–D match their actual values. This is acheived by passing plotV=True.
 
-Note also that the agent can visit the same state more than once inside the same episode. We can take the sum starting from the first visit, or every visit, each yields a different algorithm. The first-visit algorithm is more suitable for tabular methods, while the every-visit algorithm is more suitable when using function approximation methods (such as neural networks).
-
-## MRP environment for prediction
-
-To be able to develop the methods of MC we would need to develop an MRP and MDP classes that is able to interact and collect experience from an environment for prediction and control, respectively. Below we show the skeleton of this class. But first we show some efficiency comparisons, you may skip directly to the MRP class [section](#MRP-Class-for-prediction).
-
-
-
-### MRP Class for prediction
-In the following class, we will try to build a useful and generic MDP/MRP class that will serve our different needs in various RL coverage steps. In particular, we want the interact() and the steps() functions to be as flexible and generic as possible. Towards that end, we have constructed our class to have the following sections:
-
-1. Initialisation part: initialises the different variables necessary for our treatment
-2. Buffer storage section: store experience
-3. Steps section: takes a step in the environment and stores its correspondent dynamic (r,s,a). We have two types of steps: step_a(), suitable for most algorithms, and step_an(), which requires knowing the next action in advance. These two are useful in unifying the treatment of different RL algorithms, including prediction and control. For example, TD (prediction) and Q-learning(control) have a similar algorithm structure that entails using step_a(), while the Sarsa algorithm (control) uses step_an(). You will see these algorithms in the next lesson. Just be aware that you might want to change the default step function, step_a(), if your algorithm needs to know the next action, designated as *an*, to update its value function estimation.
-4. Interact section: this part is the heart and soul of our class. It runs several episodes, each with several steps, until a goal is reached, a buffer is full, or some other condition is met.
-5. Policy section: this is a set of policies according to which the agent will act. They can be either stationary (i.e., their probabilities do not change) or non-stationary (i.e., their probability will vary with Q, our action-value-function estimation).
-6. Metric section: to measure the performance of our algorithms. Basically, we use three metrics: 
-- the number of steps an agent took to reach a goal
-- the sum of rewards an agent collected during an episode
-- the root mean squared error of the value function estimation and the true values of an MDP or MTRP problem. This metric implies that we know a solution for a prediction in advance.
-7. Visualisation functions can be overridden in children's classes as per our needs.
-
-
-
-We defined a form of Markov Decision Process-MDP called Markov Reward Process-MRP. Like an MDP, an MRP is a stochastic process that concentrates on the rewards and states only and neutralizes the effect of actions. It is useful to study the predictive capabilities of an RL method where there are no decisions(actions) to be taken, and only we try to guess(predict) the returns of a process. 
-
-Whenever there is a predictive algorithm, we will use **MRP**, while when we develop a control algorithm, we will use **MDP**. 
-
-A typical example of an MRP is a random walk process, where an agent randomly moves left or right in a straight line of cells. A terminal state is at the end of each direction (left and right). The agent can be rewarded differently in each cell. Often, we reward the agent for moving to the far-right terminal state by 1 and everywhere else with 0. Another type of reward is to give the agent a negative -1 penalty on the far-left terminal state and 1 on the far-right state, and 0 everywhere else. See page 125 of the book.
-
-Note that the only assumption about the environment is to provide a reset() and a step() functions that abide by the following general form:
-1. reset() must return a value of the initial state with a proper representation. So, when we move to function approximation, it must return a vector representing the state.
-2. step() must return four values,  the first is the state (observation) that is compatible with what is returned by reset(). The second is the reward for the current state, and the third is a flag to signal the end of an episode; usually, when the agent achieves the required task or fails for some reason, each would have a corresponding suitable reward. A fourth is an empty dictionary of information we provided for compatibility with openAI environments.
-
-Let us now move to define our 1st-visit Monte Carlo *prediction* method. This method averages the return for only the first visit of a state in each episode.
-
-
-```python
-
-class MC1st(MRP):
-        
-    def init(self):
-        self.store = True
-        self.ΣV   = self.V*0      # the sum of returns for all episodes
-        self.ΣepV = self.V*0      # counts for numbers of times we add to the return  
-
-    # ----------------------------- 🌘 offline, MC learning: end-of-episode learning 🧑🏻‍🏫 --------------------------------    
-    # MC1stVisit average all past visits to a state in all episodes to get its return estimates
-    # we simply override the offline() function of the parent class
-    def offline(self):
-
-        #initialise the values
-        Vs = self.V*0
-        epV= self.V*0
-
-        # obtain the return for the latest episode
-        Gt = 0
-        for t in range(self.t, -1, -1):
-            s = self.s[t]
-            rn = self.r[t+1]
-
-            Gt = self.γ*Gt + rn
-            Vs[s] = Gt
-            epV[s] = 1
-
-        # add the counts to the experience and obtain the average as per MC estimates
-        self.ΣV   += Vs
-        self.ΣepV += epV
-        ind = epV>0 # avoids /0
-        self.V[ind] = self.ΣV[ind]/self.ΣepV[ind] 
-        
-
-```
-
-
-## MRP with visualisation
-
-To help us to visualize the learning that is taking place in each episode, we have created a set of visualization functions that we will add to the MRP class. Familiarize yourself with these functions, they are self-explanatory. Mainly we have one function for plotting after each episode, not surprisingly called plot_ep(), and another function called plot_exp() that will be called at the end of the experience (after finishing all episodes). In addition, we have an Error() function to calculate the RMSE  between the true values and the predicted values of the states as well as plot_V() function that visualises the predicted values and true values to see visually how the algorithm is doing to come closer towards the true values.
-
-As we did with the Grid class, we will call the child name the same name as the parent (MRP) to help us keep the code consistent and simplify the treatments of our classes when we import a class. The downside is that you would have to re-execute the first parent and its subsequent children if you want to make some changes to the class since it will keep adding to previous definitions, so please be mindful of this point.
-
-We have also tried to reduce the overhead as much as possible for the new class by setting up visualisation only when it is necessary (when one of the plot functions is called)
-
-
-### Applying MC1st on a prediction problem
-
-Let us now run MC1st with the latest useful visualisation.
+Next to this, an error plot tracks the total error per episode, providing insight into the learning process. Each episode begins in the middle state (C) and ends upon reaching either the far-left or far-right terminal states, which are unnamed since they do not have values to estimate. This is acheived by passing plotE=True.
 
 ```python
 mc = MC1st(env=randwalk(), episodes=100, plotV=True, plotE=True, seed=1).interact()
 ```
-    
 ![png](output_40_0.png)
-    
+
+We use **demoV to implicitly pass plotE=True, plotV=True, animate=True, whenever we want to demo a prediction algorithm.
 
 
-As you can see we have called 
-MC = MC1st(MRP)
-to make sure that we are dealing with latest MRP definition.
+## Policies
+Before we move into control, we need to breifly re-cover types of policies.
 
+### Epsilon-Greedy Policy
 
-Ok one more thing, to avoid passing the value of plotE=True, plotV=True, animate=True, whenever we want to demo a prediction algorithm, we can create a dictionary and store these values in it and then pass the reference to the MC1st call, below we show how.
+The epsilon-greedy policy is a popular action selection strategy that balances exploration and exploitation. The policy chooses the action with the highest estimated value most of the time, but with probability \(\epsilon\), it selects an action randomly to encourage exploration.
 
+Mathematically, the epsilon-greedy policy can be defined as:
 
-```python
-demoV = {'plotE':True, 'plotV':True, 'animate':True} # suitable for prediction
-```
+\[
+\pi(a|s) = 
+\begin{cases} 
+\frac{\epsilon}{|A|}, & \text{with probability } \epsilon \\
+1 - \epsilon + \frac{\epsilon}{|A|}, & \text{for the action with the highest value} \\
+0, & \text{for all other actions}
+\end{cases}
+\]
 
+Where:
+- \(\epsilon\) is the probability of exploring (random action).
+- \(|A|\) is the total number of actions available.
+- The action with the highest value \(Q(s,a)\) is selected with probability \(1-\epsilon + \frac{\epsilon}{|A|}\).
 
-```python
-mc = MC1st(episodes=100, **demoV, seed=1).interact()
-```
+### Softmax Policy
 
-    
-![png](output_46_0.png)
-    
+The softmax policy selects actions based on a probability distribution that is a function of the action values. The policy assigns a higher probability to actions with higher expected returns, and the probability of selecting action \(a\) in state \(s\) is proportional to the exponential of its action-value \(Q(s, a)\).
 
-## MDP environment for control
+Mathematically, the softmax policy is given by:
 
-Let us now extend our MRP class to deal with control. We would need to deal with the Q action-value function instead of the value function V. Also lacking is a set of non-stationary policies that allows us to take advantage of the Q action-value function. Below we show this implementation. 
+\[
+\pi(a|s) = \frac{e^{Q(s,a)/\tau}}{\sum_{b \in A} e^{Q(s,b)/\tau}}
+\]
 
-We also use a class factory to define our MDP class. Doing so will save us from redefining the class again when we amend our MRP class. We will need to amend the MRP when we change the state representation to use function approximation in the next unit.
+Where:
+- \(\tau\) is the temperature parameter that controls the level of exploration. A high \(\tau\) encourages more exploration (more uniform distribution), and a low \(\tau\) leads to more exploitation (choosing the highest value action).
+- \(Q(s,a)\) is the action-value function.
 
-The q0 is the initial set of values we might want to set up for all our Q estimates. We can also opt for completely random values for each action-value pair, we have left this out for simplicity of the coverage, but you can try it yourself.  ε is the percentage of time we want our agent to explore. 
+In this way, the softmax policy ensures that actions with higher values are more likely to be chosen, but there is always a chance to explore other actions.
 
-The class defines a set of policy-related functions that revolve around the ε-greedy policy. We have implemented a simple, deterministic greedy policy that always chooses the first max Q action greedy_(). The main difference between greedy_() and εgreedy() for ε=0 is that the latter stochastically chooses between multiple *optimum* actions with the same action-value function. This is useful when we use exploration by optimistic initialisation since the greedy_() function can cause action starvation (a phenomenon where the action is never selected). Nevertheless, greedy_() is useful to test the optimality of a learned policy (once learning finishes) and is used within πisoptimal() function.
-
-The πisoptimal() function returns whether the current policy is optimal by checking if the agent can reach the goal in a predefined number of steps stored in self.Tstar. The π() function returns the probability of taking a certain action under the ε-greedy policy. Finally, the render() function deals with rendering a policy.
-
-We used a class factory for MDP. This is because we want our class to be flexible later to accommodate for changes in the MRP parent class. That is if we change the MRP class in later lessons we do not need to restate the MDP definition to inherit from the new MRP class, instead we just pass MDP(MRP) where MRP will be taken as the latest definition. This is will be appreciated in later lessons.
 
 ## First-visit MC control 
+Now let us extend our first-visit MC prediction to control by updating the Q action-value function instead of the state-value function V.
 
-Now we extend this class to overload the offline function to offload it with our 1st-visit Monte Carlo method for control.
-
-
-```python
-class MC1stControl(MDP()):
-        
-    def init(self):
-        self.store = True
-        self.ΣQ   = self.Q*0      # the sum of returns for all episodes
-        self.ΣepQ = self.Q*0      # counts for numbers of times we add to the return  
-    
-    def offline(self): 
-        #initialise the values
-        Qs = self.Q*0
-        epQ= self.Q*0
-        
-        # obtain the return for the latest episode
-        Gt = 0
-        for t in range(self.t, -1, -1):
-            s = self.s[t]
-            a = self.a[t]
-            rn = self.r[t+1]
-            
-            Gt = self.γ*Gt + rn
-            Qs[s,a] = Gt
-            epQ[s,a] = 1
-
-        # add the counts to the experience and obtain the average as per MC estimates
-        self.ΣQ   += Qs
-        self.ΣepQ += epQ
-        ind = epQ>0 # avoid /0
-        self.Q[ind] = self.ΣQ[ind]/self.ΣepQ[ind] 
-
-```
+\(
+\begin{array}{ll}
+\textbf{Algorithm: }  \text{First-Visit Monte Carlo Control (Exploring Starts)} \\
+\textbf{Input: } \text{Episodes generated under an exploring-starts policy} \\
+\textbf{Initialize: }  Q(s, a) \leftarrow 0, N(s, a) \leftarrow 0, \forall s \in S, a \in A(s), \pi(s) \leftarrow \text{arbitrary policy}, \forall s \in S \\
+\textbf{For each episode: } & \\
+\quad \text{Generate an episode: } (s_1, a_1, r_2, s_2, a_2, \dots, s_T) & \\
+\quad G \leftarrow 0 & \\
+\quad \textbf{For each step t from T to 1:} & \\
+\quad \quad G \leftarrow \gamma G + r_{t+1} & \\
+\quad \quad \text{If } (s_t, a_t) \text{ appears first in the episode:} & \\
+\quad \quad \quad N(s_t, a_t) \leftarrow N(s_t, a_t) + 1 & \\
+\quad \quad \quad Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \frac{1}{N(s_t, a_t)}(G - Q(s_t, a_t)) & \\
+\quad \quad \text{Update policy: } \pi(s) \leftarrow \arg\max_a Q(s, a) & \\
+\textbf{Return: } Q(s, a), \pi(s), \forall s \in S, a \in A(s) \\
+\end{array}
+\)
 
 ### Applying MC on a control problem
 
@@ -316,9 +228,25 @@ Unfortunately, applying the MC control algorithm with the default reward functio
 ```python
 mc = MC1stControl(env=grid(), γ=1, episodes=200,  seed=10, **demoQ()).interact()
 ```
-
 ![png](output_67_0.png)
-    
+
+### Exploration-Exploitation and Exploring Starts
+
+- Exploration-Exploitation Tradeoff: In reinforcement learning, the agent must balance exploration (trying new actions to discover better long-term rewards) with exploitation (choosing known actions that yield high rewards based on current knowledge).
+  
+In exploration, the agent tries actions that it has not explored enough yet. This is necessary to gather more information about the environment. In exploitation, the agent uses its current knowledge to select actions that maximize the immediate reward based on its existing value estimates. Both of these needs to happen for the agent to learn effectively. $\epsilon$-Greedy and softmax policies has a built-in exploraiton-exploitation capabilities.
+
+<!-- - $\epsilon$-Greedy Policy: A commonly used policy to handle exploration-exploitation:
+    - With probability \( \epsilon \), the agent chooses a random action (exploration).
+    - With probability \( 1 - \epsilon \), the agent chooses the action that maximizes the value estimate (exploitation).
+
+- Softmax Policy: Instead of choosing actions randomly, the softmax policy selects actions based on a probability distribution derived from the action values. Actions with higher values are more likely to be chosen, but there is always a non-zero chance of selecting less optimal actions (exploration). -->
+
+- Exploring Starts: This is a method used to ensure complete exploration of the state-action space. In exploring starts, each episode begins with a random state and a random action. This guarantees that over many episodes, every state-action pair will eventually be visited, ensuring unbiased value estimation. This condition dictates that all states must be randomly started with to gurantee convergance. It is needed for 1stMCC since it relies on the getting enough coverage for all of the states.
+
+Exploring starts guarantees initial exploration and helps ensure all state-action pairs are visited, making it easier for the agent to discover good policies without biases. Exploration-exploitation policies (like $\epsilon$-greedy or softmax) are methods to balance exploration and exploitation during the agent's learning process. These policies allow for exploration to continue throughout the agent's learning, which is particularly useful when the environment is unknown. Exploration-exploitation balance plays an important role when we move into online methods. But they are still important to achieve an end of episode, and $\epsilon$-greedy is useful to avoid the exploring-start condition. 
+
+In short, exploring starts ensures full exploration at the beginning of episodes, while exploration-exploitation policies control the balance between exploration and exploitation throughout the learning process.
 
 
 ### The role of the discount factor $\gamma$ for delayed reward
@@ -330,37 +258,26 @@ It is always the case that when we use a *delayed reward* (which is the default 
 ### Solution 1
 Below we show how we can simply reduce $\gamma$ to solve this issue.
 
-
 ```python
 mc = MC1stControl(env=grid(), γ=.99, episodes=30, seed=10, **demoTR()).interact()
-```
-
-
-    
+``` 
 ![png](output_70_0.png)
-    
-
 
 ### Solution 2
 Also we can compensate for the above issue, we would need to set up a reward function that allows the agent to quickly realise when it stuck in some not useful policy.
 
-
 ```python
 env1 = grid(reward='reward_1')
 mcc = MC1stControl(env=env1, episodes=30, seed=0, **demoTR()).interact()
-```
-
-
-    
+```    
 ![png](output_72_0.png)
-    
 
 
 Compare the above policy with the one produced by the DP solution in lesson 2. You will notice that the MC solution does not give a comprehensive solution from all states because we do not start from different cells. The starting position is fixed. The exploration nature of the policy allowed the agent to develop an *understanding* through its Q function of where it should head if it finds itself in a specific cell. The Markovian property is essential in guaranteeing that this can be safely assumed.
 
 You might have noticed that although the task is very straightforward, the agent detoured a bit from the simplest straight path that leads to the goal. Bear in mind that we are adopting an εgreedy policy by default, which means that the agent will take some explorative actions 10% of the time. But this should not have prevented the maxQ policy from pointing towards the goal. This is because of the nature of MC itself and its sampling averages. The next section demonstrates how we can overcome this difficulty.
 
-We can play with the exploration but that is needs lots of trail and is not straightforward.
+We can play with the exploration but that needs lots of trail and is not straightforward.
 
 ```python
 mc = MC1stControl(env=grid(), γ=.97, episodes=50, ε=.5, dε=.99, seed=20, **demoTR()).interact()
@@ -378,7 +295,37 @@ mcc = MC1stControl(env=grid(reward='reward_1'), γ=.97, episodes=100, ε=0.9, d�
 
 ## Incremental constant-α MC: Every-visit MC Prediction
 
-### Monte Carlo Control with \(\epsilon\)-Greedy Exploration
+In Incremental constant-α MC (Every-visit Monte Carlo), the value of a state is updated based on the average of returns observed from all visits to that state, not just the first visit. This method updates the state-value function incrementally using a constant step-size parameter \( \alpha \) for each visit, allowing the agent to continuously refine its estimates as it observes more returns. The update rule is:
+
+\[
+V(s) \leftarrow V(s) + \alpha \left( G_t - V(s) \right)
+\]
+
+Where:
+
+- \( V(s) \) is the value of state \( s \),
+- \( G_t \) is the return (sum of discounted rewards) from state \( s \) onwards,
+- \( \alpha \) is the constant step-size parameter.
+  
+This method is useful in scenarios where multiple visits to the same state provide valuable updates, and it works well for episodic tasks. Below we show the full algorithm in pseudocode.
+
+\(
+\begin{array}{ll}
+\textbf{Algorithm: }  \text{Incremental Constant-}\alpha \text{ Monte Carlo Prediction} \\
+\textbf{Input: } \text{Episodes generated under policy } \pi \\
+\textbf{Initialize: }  V(s) \leftarrow 0, \forall s \in S, 0 < \alpha \leq 1 \\
+\textbf{For each episode: } & \\
+\quad \text{Generate an episode: } (s_1, r_2, s_2, \dots, s_T) & \\
+\quad G \leftarrow 0 & \\
+\quad \textbf{For each step t from T to 1:} & \\
+\quad \quad G \leftarrow \gamma G + r_{t+1} & \\
+\quad \quad \text{Update state-value estimate:} & \\
+\quad \quad \quad V(s_t) \leftarrow V(s_t) + \alpha (G - V(s_t)) & \\
+\textbf{Return: } V(s), \forall s \in S \\
+\end{array}
+\)
+
+<!-- ### Monte Carlo Control with \(\epsilon\)-Greedy Exploration
 
 To optimize policies, we extend MC to **control**, using the **Generalized Policy Iteration (GPI)** framework. The key idea is:
 
@@ -404,65 +351,90 @@ To optimize policies, we extend MC to **control**, using the **Generalized Polic
 \quad \quad \quad \text{Choose random action with probability } \epsilon & \\
 \textbf{Return:} & Q(s, a), \pi(s) \forall s, a \\
 \end{array}
-\]
+\] -->
+## MRP, MDP and PG classes
+We will evaluate the effectiveness of prediction methods by applying them to a random walk problem. This setup isolates the prediction aspect of an algorithm, focusing purely on estimating the state-value function without involving decision-making. By doing so, we can assess whether a given update rule or algorithm works effectively in the prediction setting.
 
+Once we understand the prediction process, we can extend these methods to control by modifying the update rule to incorporate action-value estimates (Q-values). This transition is typically done within the MDP framework and is a key step in value-based reinforcement learning methods.
+
+Beyond value-based approaches, there is another class of methods called policy-based or *policy gradient (PG)* methods, which optimise the policy directly instead of using a value function. Unlike value-based methods, policy gradient approaches are typically applied to control problems, such as grid-world mazes, rather than random walk problems.
+
+**We use a parent class MRP for any prediciton model-free method which has access to V. We use MDP parent class for any control model-free method, which has access to Q as well as to an $\epsilon-$greedy policy, while the MRP have no policy (it is actually an arbitrary policy). We use PG class for any policy-gradient method, PG has access to both V and Q as well as to a softmax policy.**
+
+
+### Incremental constant-α MC (prediction) with Python
+Below we show a direct *interpretaiton* of the above pseudocode prediction model-free method into a python code. We use MRP as its parent class.
 
 ```python
 class MC(MRP):
-
     def init(self):
-        self.store = True
-
-    # ----------------------------- 🌘 offline, MC learning: end-of-episode learning ----------------------    
-    def offline(self):
-        # obtain the return for the latest episode
+        self.store = True # stores the trajectory of the episode, always needed for offline
+    # ------------------ 🌘 offline, MC learning: end-of-episode learning ------------------
+    def offline(self): # called at the end of the latest episode
         Gt = 0
-        for t in range(self.t, -1, -1):
-            s = self.s[t]
-            rn = self.r[t+1]
-            
-            Gt = self.γ*Gt + rn
-            self.V[s] += self.α*(Gt - self.V[s])
+        for t in range(self.t, -1, -1):          # go throgh experience backwards as per Gt in update
+            s, rn = self.s[t], self.r[t+1]       # retrieve the state and reward for past step t 
+            Gt = self.γ*Gt + rn                  # calculate the return for past time step t
+            self.V[s] += self.α*(Gt - self.V[s]) # update the state-value function
 ```
 
 This type of algorithmic design is more flexible and will be used in general in RL instead of the implementation that requires storing the sums or averages.
 
-<!-- ### Apply incremental MC on prediction problem -->
-
 Let us try our new shiny prediction algorithm on the random walk problem.
-
 
 ```python
 mc = MC( α=.02, episodes=50, **demoV()).interact()
-```
-    
+``` 
 ![png](output_101_0.png)
     
 
-
-Notice how jumpy the MC is.
-
 ## Incremental MCC: Every-visit MC Control
 
+**Incremental MCC (Monte Carlo Control)** for **Every-visit MC** Control is an approach used for estimating optimal policies through interaction with the environment. It incrementally updates both the state-action value function \( Q(s, a) \) and the policy using every visit to a state-action pair. The method involves updating the action-value function based on the observed returns, and it uses a constant step-size parameter \( \alpha \) to control the magnitude of updates:
+
+\[
+Q(s, a) \leftarrow Q(s, a) + \alpha \left( G_t - Q(s, a) \right)
+\]
+
+Where:
+
+- \( Q(s, a) \) is the action-value function,
+- \( G_t \) is the return from state-action pair \( (s, a) \),
+- \( \alpha \) is the constant step-size parameter.
+
+This method is applied iteratively to improve the policy, choosing actions greedily with respect to the estimated \( Q \)-values. Below we show the pseudocode for thsi algorithm.
+
+\(
+\begin{array}{ll}
+\textbf{Algorithm: }  \text{Incremental Constant-}\alpha \text{ Monte Carlo Control} \\
+\textbf{Input: } \text{Episodes generated under an } \varepsilon\text{-greedy policy} \pi \\
+\textbf{Initialize: }  Q(s, a) \leftarrow 0, \forall s \in S, a \in A(s), 0 < \alpha \leq 1 \\
+\textbf{For each episode: } & \\
+\quad \text{Generate an episode: } (s_1, a_1, r_2, s_2, a_2, \dots, s_T) & \\
+\quad G \leftarrow 0 & \\
+\quad \textbf{For each step t from T to 1:} & \\
+\quad \quad G \leftarrow \gamma G + r_{t+1} & \\
+\quad \quad \text{Update action-value estimate:} & \\
+\quad \quad \quad Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha (G - Q(s_t, a_t)) & \\
+\quad \quad \text{Update policy: } \pi(s) \leftarrow \arg\max_a Q(s, a) & \\
+\textbf{Return: } Q(s, a), \pi(s), \forall s \in S, a \in A(s) \\
+\end{array}
+\)
+
+### Incremental constant-α MC with Python
+Below we show a direct *interpretaiton* of the above pseudocode into a python code. We use a parent class MDP parent class for this control model-free method.
 
 ```python
-# note that the name has double C: we are dealing with MC+Control
 class MCC(MDP()):
-
     def init(self):
         self.store = True
-
-    # ---------------------------- 🌘 offline, MC learning: end-of-episode learning 🧑🏻‍🏫 -----------------------    
-    def offline(self):  
-        # obtain the return for the latest episode
+    # ------------------ 🌘 offline, MC learning: end-of-episode learning 🧑🏻‍🏫 ---------------
+    def offline(self):  # called at the end of the latest episode
         Gt = 0
         for t in range(self.t, -1, -1):
-            s = self.s[t]
-            a = self.a[t]
-            rn = self.r[t+1]
-
-            Gt = self.γ*Gt + rn
-            self.Q[s,a] += self.α*(Gt - self.Q[s,a])
+            s, a, rn = self.s[t], self.a[t], self.r[t+1] # retrieve the state, action and reward for past step t 
+            Gt = self.γ*Gt + rn                          # update Gt incrementally
+            self.Q[s,a] += self.α*(Gt - self.Q[s,a])     # update the action-value function
 ```
 
 
@@ -474,7 +446,6 @@ mcc = MCC(env=grid(reward='reward1'), α=.2, episodes=1, seed=0, **demoQ()).inte
     
 
 <!-- ### Apply incremental MC on control problem -->
-
 
 As we can see, although we solved the issue of tracking a non-stationary policy when we used a constant learning rate α, and we tried to use a reward function that gives immediate feedback to each step instead of a delayed reward, but still the performance is not as good as we wished for. This is due to our final issue, which is the action precedence that we set up to prefer left over right. If we change this precedence, it will help the agent to immediately find the goal, however, we set it up this way to make the problem more challenging. Consider changing this precedence to see the effect.
 
@@ -498,35 +469,28 @@ We start our coverage for policy gradient methods with an offline method; REINFO
 
 **Note** that policy gradient sections in this lesson, and the next are based on chapter 13 of our book. They can be read as they appear in the notebook or delayed until the end of lesson 9.
 
-
-### Policy Gradient Class
+<!-- ### Policy Gradient Class -->
 The softmax is the default policy selection procedure for Policy Gradient methods. $\tau$ acts like an exploration factor (more on that later) and we need to one-hot encoding for the actions.
 
-Ok, so now we are ready to define our REINFORCE algorithm. This algorithm and other policy gradient algorithm always have two updates, one for V and one for Q. In other words, the action-value function update will be guided by the state-value update. We usually call the first update deals that with V, the critic and the second update that deals with Q the actor.
+Ok, so now we are ready to define our REINFORCE algorithm. This algorithm and other policy gradient algorithm always have two updates, one for V and one for Q. In other words, the action-value function update will be guided by the state-value update. We usually call the first update deals that with V, the critic and the second update that deals with Q the actor. Below we show the python code for this algorithm.
 
 
 ```python
 class REINFORCE(PG()):
-    
     def init(self):
         self.store = True
-
     # -------------------- 🌘 offline, REINFORCE: MC for policy gradient methdos ----------------------
     def offline(self):
         π, γ, α, τ = self.π, self.γ, self.α, self.τ
         # obtain the return for the latest episode
         Gt = 0
-        γt = γ**self.t                  # efficient way to calculate powers of γ backwards
-        for t in range(self.t, -1, -1): # reversed to make it easier to calculate Gt
-            s = self.s[t]
-            a = self.a[t]
-            rn = self.r[t+1]
-            
-            Gt = γ*Gt + rn
-            δ = Gt - self.V[s]
-            
-            self.V[s]   += α*δ
-            self.Q[s,a] += α*δ*(1 - π(s,a))*γt/τ
+        γt = γ**self.t                           # efficient way to calculate powers of γ backwards
+        for t in range(self.t, -1, -1):          # backwards
+            s, a, rn = self.s[t], self.a[t], self.r[t+1]
+            Gt = γ*Gt + rn                        # update Gt incrementally
+            δ = Gt - self.V[s]                    # obtain the error
+            self.V[s]   += α*δ                    # update V as per the error
+            self.Q[s,a] += α*δ*(1 - π(s,a))*γt/τ  # update Q as per the erro with complement of the policy π
             γt /= γ
 
 ```
