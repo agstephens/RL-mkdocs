@@ -467,7 +467,7 @@ The best policy representation in a policy gradient method is the action selecti
 
 We start our coverage for policy gradient methods with an offline method; REINFORCE. REINFORCE is an algorithm that takes a *policy gradient* approach instead of an action-value function approach. The idea is simple, given that an episode provides a sample of returns for the visited states, at the end of an episode, we will take the values of the states and use them to guide our search to find the optimal policy that maximises the value function. 
 
-**Note** that policy gradient sections in this lesson, and the next are based on chapter 13 of our book. They can be read as they appear in the notebook or delayed until the end of lesson 9.
+<!-- **Note** that policy gradient sections in this lesson, and the next are based on chapter 13 of our book. They can be read as they appear in the notebook or delayed until the end of lesson 9. -->
 
 <!-- ### Policy Gradient Class -->
 The softmax is the default policy selection procedure for Policy Gradient methods. $\tau$ acts like an exploration factor (more on that later) and we need to one-hot encoding for the actions.
@@ -566,7 +566,8 @@ Monte Carlo methods provide a powerful alternative to Dynamic Programming for RL
 In the next unit, we will explore Temporal-Difference (TD) learning methods, which update state-value estimates without requiring complete episodes. Instead, TD methods rely on one-step updates, much like Value Iteration incrementally improves policies. We will also introduce TD-based action-value methods for control, including SARSA and Q-learning, which use the Q action-value function to learn optimal policies.
 
 **Reading**:
-For further reading you can consult chapter 5 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf).
+For further reading you can consult chapter 5 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf). The policy gradient sections in this lesson, and the next are based on chapter 13 of our book. They can be read as they appear in the notebook or delayed until the end of lesson 9.
+
 
 
 ## Your turn
