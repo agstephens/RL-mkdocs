@@ -27,7 +27,6 @@ By the end of this unit, you will be able to:
 
 In this lesson, we cover the Temporal Difference learning method. TD is one of the fundamental ideas in RL. It uses bootstrapping to improve its predictions. The idea behind bootstrapping is to use (own estimation) to improve (own estimation) with an indication from the ground truth in the form of a reward. This sound surprising since we are not using a direct ground truth to revert to when we are improving the prediction. However, it turns out that there are theoretical guarantees that the method will converge to a solution that is usually *close to optimal*. The one constant stream of ground truth the agent keeps receiving is the rewards in each state. One of the major strengths of TD is that it can be used online without having to wait till the end of the episode as we did in the Monte Carlo methods. This also makes it extremely efficient and allows it to converge faster *in practice *than MC. TD uses ideas similar to what we did in GPI: slightly improving the prediction and *not* waiting until everything is clear (at the end of an episode). This idea is similar to what we did in stochastic mini-batch updates in ML. We will call it eagerness to learn. I.e., to grab whatever information is available and whenever it becomes available but at the same time keep accumulating a stock of this information to help us improve and sharpen our prediction. We will then move into designing control algorithms that depend on TD, we will tackle old and new algorithms, including Sarsa, Expected Sarsa, Q-learning and double Q-learning, and we will test them extensively using the infrastructure that we developed in the previous lesson. Finally, we conclude by studying a policy gradient algorithm for control, namely actor-critic, that depends on TD and REINFORCE.
 
-As usual, we will take a practical/pragmatic approach to cover the material and leave the theory to the book, which is well covered. Note that there are far more rigorous books that take special care for the mathematics guarantees behind the ideas of RL, which are not covered in our textbook [Introduction to Reinforcement Learning](http://incompleteideas.net/book/RLbook2020.pdf) but can be found in operation research books such as [Neuro-Dynamic Programming](http://web.mit.edu/jnt/www/ndp.html).
 
 **Plan**
 As usual, in general there are two types of RL problems that we will attempt to design methods to deal with 
@@ -42,17 +41,68 @@ Ok, so we start by implementing the TD algorithm. Due to the way we structured o
 
 We also would need to pass a learning step as we did for the MC algorithm. A learning step dictates how much error percentage will be considered when we update the value function. Sometimes we could go all the way α=1 when the algorithm is tabular, and the problem is simple. For most of the problems and algorithms we tackle, however, this is not desirable, and we set α=.1 or less to ensure the algorithm performs well on the common states and is acceptable on less common states. MC, however, is particularly sensitive towards this α, and we often would need to set it to smaller values such as .01.
 
+## Temporal-Difference (TD) Learning (prediction)
+Eralier in a previous lesson, we saw how constant-$\alpha$ MC prediction method, have an update rule of the form:
+
+\[
+    V(S_t) \leftarrow V(S_t) + \alpha \left( G(S_t) - V(S_t) \right)
+\]
+
+*The main idea of several well-known RL algorithms is to replace $G_t$ with an estimation.* Temporal-Difference (TD) learning is a key reinforcement learning method that updates value estimates based on *bootstrapping*, meaning it uses its own current estimates to update future predictions. The TD methods updates the state-value function \(V(s)\) using one-step lookahead, i.e it replaces $G_t$ by $R_{t+1} + \gamma V(S_{t+1})$ in the constant-$\alpha$ MC update rule: 
+
+\[
+    V(S_t) \leftarrow V(S_t) + \alpha \left( R_{t+1} + \gamma V(S_{t+1}) - V(S_t) \right)
+\]
+
+Where:
+
+- \( \alpha \) is the step-size (learning rate),
+- \( r_{t+1} \) is the reward received after taking action in \( s_t \),
+- \( \gamma \) is the discount factor,
+- \( V(s_{t+1}) \) is the estimate of the next state's value.
+
+Unlike Monte Carlo (MC) methods, which require complete episodes (including constant $\alpha$ MC), TD does not require a complete episode, like constant $\alpha$ MC, TD methods update values *incrementally* after each time step, making them more efficient for continuous or long-horizon problems. The replacement of $G_t$ sample with an estimate leads to infusing bias into TD, but the use of bootstrapping leads to a lower variance. TD tends to be faster than MC and more efficient, so the trad-off of the bias-variance is well worth it. Add to that its ability to truely incrmentally update the estimate as *rewards* are collected.
+
+Below we show the pseudocode for the TD algorithm.
+
+\(
+\begin{array}{ll}
+\textbf{Algorithm: } \text{TD(0) Prediction} \\
+\textbf{Input: } \text{Policy } \pi, \text{ step-size } \alpha, \text{ discount factor } \gamma \\
+\textbf{Initialize: }  V(s) \leftarrow 0, \forall s \in S \\
+\textbf{Loop for each episode:} \\
+\quad \text{Initialize } s \\
+\quad \textbf{Loop for each step } t \textbf{ until episode ends:} \\
+\quad \quad \text{Take action } a \sim \pi(s), \text{ observe } r, s' \\
+\quad \quad V(s) \leftarrow V(s) + \alpha \left( r + \gamma V(s') - V(s) \right) \\
+\quad \quad s \leftarrow s' \\
+\textbf{Return: } V(s), \forall s \in S \\
+\end{array}
+\)
+
+---
+
+## TD vs. Monte Carlo (MC)
+| Feature         | Temporal-Difference (TD) | Monte Carlo (MC) |
+|---------------|------------------------|------------------|
+| **Update**   | After each time step    | After full episode |
+| **Exploration Requirement** | Can learn from incomplete episodes | Requires complete episodes |
+| **Variance** | Lower variance due to bootstrapping | Higher variance since full returns are used |
+| **Bias** | More biased as it relies on current estimates | Less biased since it uses true returns |
+| **Sample Efficiency** | More efficient, updates per time step | Less efficient, updates once per episode |
+| **Suitability** | Better for continuous/long tasks | Works well for episodic tasks |
+
+TD methods blend **bootstrapping (like Dynamic Programming)** and **sampling (like MC)**, making them a flexible and powerful approach for reinforcement learning.
+
+Below we provide you with the Python code to implement this algorithm.
 
 ```python
 class TD(MRP):
-    # def stop_exp(self):
-        
     # ----------------------------- 🌖 online learning ----------------------    
     def online(self, s, rn,sn, done, *args): 
         self.V[s] += self.α*(rn + (1- done)*self.γ*self.V[sn] - self.V[s])
 ```
-
-Note how we multiplied the value $V[s_{t+1}]$ by (1- done). This is to ensure that when the episode is finished (ex., the agent is at goal or has achieved the task), we want only the final reward $r_{t+1}$ to participate in the update and not $V[s_{t+1}]$. This multiplication will appear in all of the updates we use. This saves us from having to treat the goal states in a special way on the environment level (ex. we could have set the value $V[s_{t+1}]$=0 by checking if $s_{t+1}==goal$ or by checking done in the environment or by treating done inside the s_() function when we use function approximation in later lessons). We felt that this would disguise this information, and it is always better to be explicit when possible.
+That it, this is all what you need to implement TD!. Note how close the implementation is to the update rule. Note also how we multiplied the value $V[s_{t+1}]$ by (1- done). This is to ensure that when the episode is finished (ex., the agent is at goal or has achieved the task), we want only the final reward $r_{t+1}$ to participate in the update and not $V[s_{t+1}]$. This multiplication will appear in all of the updates we use. This saves us from having to treat the goal states in a special way on the environment level (ex. we could have set the value $V[s_{t+1}]$=0 by checking if $s_{t+1}==goal$ or by checking done in the environment or by treating done inside the s_() function when we use function approximation in later lessons). We felt that this would disguise this information, and it is always better to be explicit when possible.
 
 Note also that we didn't use *a* and *an* in the online() function because we are making predictions in TD (no control yet). In addition, we do not store the experience for this one-step online algorithm while we had to for MC, which is again one of the advantages of online methods.
 
@@ -72,16 +122,31 @@ Note how TD performed far better and converged faster in fewer episodes than MC
 ### Offline TD
 In this section, we develop an offline TD algorithm. This is not a common algorithm as it usually defies the reason for using TD. That is, we usually use TD because it is an online algorithm. Nevertheless, studying this algorithm allows us to appreciate the strengths and weaknesses of TD and to compare its performance with other offline algorithms, such as MC.
 
+\[
+\begin{array}{ll}
+\textbf{Algorithm: }  \text{Offline Temporal-Difference Policy Evaluation} \\
+\textbf{Input: } \text{Episodes generated under policy } \pi \\
+\textbf{Initialize: } V(S) \leftarrow 0, \forall S \in \mathcal{S}, \alpha > 0 \\
+\textbf{Repeat until convergence: } & \\
+\quad \text{For each episode: } & \\
+\quad \quad \textbf{For each step } t \textbf{ from } 0 \textbf{ to } T-1: & \\
+\quad \quad \quad \delta_t \leftarrow R_{t+1} + \gamma V(S_{t+1}) - V(S_t) & \\
+\quad \quad \quad \text{Store } (S_t, \delta_t) \text{ for batch update} & \\
+\quad \text{End episode loop} & \\
+\quad \textbf{For each state } S_t \textbf{ in batch:} & \\
+\quad \quad V(S_t) \leftarrow V(S_t) + \alpha \sum \delta_t \text{ (update using accumulated } \delta_t \text{)} & \\
+\textbf{Return: } V(S), \forall S \in \mathcal{S} \\
+\end{array}
+\]
+
+Below we provide you with the Python implementation of the offline TD.
 
 ```python
 class TDf(MRP):
-
     def init(self):
         self.store = True
-    
     # ----------------------------- 🌘 offline TD learning ----------------------------   
     def offline(self):
-        #for t in range(self.t, -1, -1):
         for t in range(self.t+1):
             s = self.s[t]
             sn = self.s[t+1]
@@ -89,9 +154,8 @@ class TDf(MRP):
             done = self.done[t+1]
             
             self.V[s] += self.α*(rn + (1- done)*self.γ*self.V[sn]- self.V[s])
-
 ```
-
+Note that we can do it the changes backwards, you can try both and see the difference.
 
 ```python
 TDwalk = TDf(α=.05, episodes=100, v0=.5, **demoV()).interact(label='TD learning')
@@ -139,18 +203,15 @@ In this section, we study the optimality of TD. We develop two algorithms, Batch
 
 ```python
 class MRP_batch(MRP):
-    
     def __init__(self, **kw):
         super().__init__(**kw)
         self.store = True # store the full experience
-
     # we will redfine the allocate to store the full experience instead of only latest episode
     def allocate(self): 
         self.r = np.zeros((self.max_t, self.episodes))
         self.s = np.ones ((self.max_t, self.episodes), dtype=np.uint32) *(self.env.nS+10)  
         self.a = np.zeros((self.max_t, self.episodes), dtype=np.uint32)  # actions and states are indices        
-        self.done = np.zeros((self.max_t, self.episodes), dtype=bool)
-        
+        self.done = np.zeros((self.max_t, self.episodes), dtype=bool) 
     def store_(self, s=None,a=None,rn=None,sn=None,an=None, done=None, t=0):
         # store one trajectory(sarsa) in the rigth episode buffer
         if s  is not None: self.s[t, self.ep] = s
@@ -159,7 +220,6 @@ class MRP_batch(MRP):
         if sn is not None: self.s[t+1, self.ep] = sn
         if an is not None: self.a[t+1, self.ep] = an
         if done is not None: self.done[t+1, self.ep] = done
-
     # returns the agent's trace from latest episode buffer
     def trace(self):
             return self.s[:self.t+1, self.ep]
@@ -172,8 +232,7 @@ Below we inherit the above class to allow us to conduct batch TD learning. This 
 class TD_batch(MRP_batch):
     def __init__(self, α=.001, **kw):
         super().__init__(α=α, **kw)
-
-    # -----------------------------------🌘 offline learning------------------------------------- 
+    # ------------------------🌘 offline learning----------------------- 
     def offline(self):
         # epochs
         while True:
@@ -658,8 +717,7 @@ We have further used TD update in a few control algorithms. Most notable are the
 
 
 **Further Reading**:
-For further reading you refer chapter 6 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf).
-
+For further reading you refer chapter 6 from the Sutton and Barto [book](http://incompleteideas.net/book/RLbook2020.pdf). There are more rigorous books that take special care for the mathematics guarantees behind the ideas of RL, such as [Neuro-Dynamic Programming](http://web.mit.edu/jnt/www/ndp.html).
 
 ## Your turn
 Now it is time to experiment further and interact with code in [worksheet8](../../workseets/worksheet8.ipynb).
