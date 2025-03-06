@@ -155,3 +155,4 @@ We have provided you with two [RL libraries](/RLlibrary.zip){:download="RLlibrar
 ## Better Readability and Audibility
 For better readability and experience, please use Jupyter Lab or Vcode(if you are using Azure VM) to navigate between the different notebooks easily. If you want to use Jupyter Notebooks and not Jupyter Lab, we recommend increasing the cells' width for a better experience. We provided a function that increase your notebook width which is envoked automatically when you import an environment (grid particularly). You may want to utilise also the table of contents button in Jupetr Lab.
 For better audibility of the provided videos please click on the **'noise supression'** button, you may want to speed up as per your need.
+ 
