@@ -74,6 +74,11 @@ These sources of stochasticity dictate using suitable techniques to obtain the d
 
 Ok so we are ready now to move to Dynamic programming algorithms to solve the RL problem of finding a best estimate of a value function and or finding an optimal policy. Dynamic Programming (DP) refers to a collection of algorithms used for solving Markov Decision Processes (MDPs). DP methods rely on the principle of optimality and require a known model of the environment (transition probabilities and rewards). The main algorithms used in DP are **Policy Evaluation**, **Policy Iteration**, and **Value Iteration**.
 
+<video width="560" height="315" controls>
+  <source src="/docs/videos/8. Dynamic Programming 1.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=55e740c0-8e7f-4735-b5cd-3a8911e9fc16&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create"  width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="8. Dynamic Programming 1.mkv"></iframe>
 
 
