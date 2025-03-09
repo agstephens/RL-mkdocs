@@ -17,7 +17,14 @@ While RL offers tremendous efficacy when configured appropriately, it is suscept
 
 Our module adopts a pragmatic approach, aiming to provide you with a solid theoretical grounding in RL without overly delving into intricate mathematical details. Simultaneously, we will attempt to equip you with practical skills and techniques to harness RL's benefits effectively. This balanced approach ensures that you grasp RL's essence while gaining valuable real-world application tools.
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=2efc8e37-2e42-4b77-b694-b68994652e23&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="640" height="360" frameborder="0" scrolling="no" allowfullscreen title="Wecome Video.mkv"></iframe>
+<video width="470" height="200" controls>
+  <source src="/videos/Wecome Video.mp4" type="video/mp4">
+  Wecome Video
+</video>
+
+<!-- <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=2efc8e37-2e42-4b77-b694-b68994652e23&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="640" height="360" frameborder="0" scrolling="no" allowfullscreen title="Wecome Video.mkv"></iframe> -->
+
+
 
 
 ## RL in context: advantages and challenges

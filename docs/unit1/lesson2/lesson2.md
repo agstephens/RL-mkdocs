@@ -219,7 +219,7 @@ plt.subplot(122).plot(oA,'.'); plt.xlabel('Steps'); plt.ylabel('%Optimal action'
 Note how the % of optimal actions for one trial (run) takes either 1 or 0. This figure to the left seems not be conveying useful information. However when we average this percentage over several runs we will see a clear learning pattern. This is quite common theme in RL. We often would want to average a set of runs/experiments due to the stochasticity of the process that we deal with.
 
 ### Multiple runs (aka trials)
-We need to average multiple runs to obtain a reliable unbiased results that reflect the expected performance of the learning algorithm. We do that via running the same function or algorithm multiple times, which is what the Q_bandits_runs function does. We do not show the code, we only show 
+We need to average multiple runs to obtain a reliable unbiased results that reflect the expected performance of the learning algorithm. We do that via running the same function or algorithm multiple times, which is what the Q_bandits_runs function does. We do not show the code, we only show the results of executing it. The code can be found in the associated worksheet.
 
 Note that we obtain different set of 10-bandit distributions and conduct an experimental run on them. Because all of them are normally standard distribution their sums of rewards (values) converges to the same quantity around 1.5.
 
