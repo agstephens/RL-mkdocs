@@ -3,7 +3,13 @@
 
 Please see the following video to get started with teh VM. 
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=f52d3061-e7ab-4c0f-9e5d-04dbd2e3bc95&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="640" height="360" frameborder="0" scrolling="no" allowfullscreen title="1- Introduction to Azure VM.mkv"></iframe>
+
+<video width="470" height="200" controls>
+  <source src="/videos/1. Introduction to Azure VM.mp4" type="video/mp4">
+  Wecome Video
+</video>
+
+<!-- <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=f52d3061-e7ab-4c0f-9e5d-04dbd2e3bc95&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="640" height="360" frameborder="0" scrolling="no" allowfullscreen title="1- Introduction to Azure VM.mkv"></iframe> -->
 
 
 You should recieve an email inviting you to have access to an Azure VM. The VM has [ROS 2 Foxy Fitzroy](https://docs.ros.org/en/foxy/Installation.html) already installed. ROS2 commands need to be run from the terminal not from a conda-activated terminal (due to compatibility), and they use the default system Python 3.8. The VM has the libraries required for ROS2 along with TurtleBot3 installed with the worlds required for assessment.

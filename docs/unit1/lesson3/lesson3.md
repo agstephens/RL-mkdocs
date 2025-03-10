@@ -122,10 +122,20 @@ Formally:
 p(s' | s, a) = p(s' | s, a) \quad \forall t
 \]
 
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/1. MDP.mp4" type="video/mp4">
+</video>
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=f93d3c1e-261f-42bd-93cd-92f67e120d99&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="Markov Decision Processes (MDP)" enablejsapi=1></iframe>
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/2. Dynamics.mp4" type="video/mp4">
+</video>
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=79d3a9ea-5401-4f3c-bcf2-5907255ef8da&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200"frameborder="0" scrolling="no" allowfullscreen title="2. Dynamics.mkv"></iframe>
+
+<!-- <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=f93d3c1e-261f-42bd-93cd-92f67e120d99&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="Markov Decision Processes (MDP)" enablejsapi=1></iframe>
+
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=79d3a9ea-5401-4f3c-bcf2-5907255ef8da&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200"frameborder="0" scrolling="no" allowfullscreen title="2. Dynamics.mkv"></iframe> -->
+
+
 
 ## The Policy and its Stationarity
 
@@ -215,9 +225,19 @@ Hence by multiplying $G_{t+1}$ by $\gamma$ and adding R_{t+1} we get
 
 In the video below we talk more about this important concept.
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=e5a9acea-f258-4952-8e05-46f5ffb0c576&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="3. Returns 1"></iframe>
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/3. Returns 1.mp4" type="video/mp4">
+  Returns 1
+</video>
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=8a1a8b63-58be-45ce-86b1-eedb4bc133c4&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="3. Returns 2"></iframe>
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/3. Returns 2.mp4" type="video/mp4">
+  Return 2
+</video>
+
+<!-- <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=e5a9acea-f258-4952-8e05-46f5ffb0c576&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="3. Returns 1"></iframe>
+
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=8a1a8b63-58be-45ce-86b1-eedb4bc133c4&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="3. Returns 2"></iframe> -->
 
 
 
@@ -406,7 +426,12 @@ Equation \(\eqref{eq:v}\) gives the definition of v function.
 
 In the following video we tackle this idea in more details.
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=7b8178ed-68d1-4335-8ab7-3d81f214f362&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="475" height="200"frameborder="0" scrolling="no" allowfullscreen title="4. Returns Expectation and Sampling.mkv"></iframe>
+<!-- <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=7b8178ed-68d1-4335-8ab7-3d81f214f362&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="475" height="200"frameborder="0" scrolling="no" allowfullscreen title="4. Returns Expectation and Sampling.mkv"></iframe> -->
+
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/4. Returns Expectation and Sampling.mp4" type="video/mp4">
+  Returns Expectation and Sampling
+</video>
 
 For algorithms like **Value Iteration**, it is important that the MDP is **irreducible** (all states are reachable from any other state) and **aperiodic** (there are no cycles of fixed lengths that prevent convergence).
 
@@ -451,10 +476,19 @@ Where:
 - \( Q_{\pi}(s, a) \) is the action-value function,
 - The terms \( r(s, a, s') \), \( \gamma \), and \( p(s' | s, a) \) are the same as in the value function equation.
 
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/5. Bellman v.mp4" type="video/mp4">
+  Bellman v
+</video>
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=6d6d9455-7174-447a-8bcb-eceaa51a4af5&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="5. Bellman v.mkv"></iframe>
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/6. Bellman q simple.mp4" type="video/mp4">
+  Bellman q simple
+</video>
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=3a18cbb0-6960-42c1-bcf4-8e0893c09c89&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200"frameborder="0" scrolling="no" allowfullscreen title="6. Bellman q simple.mkv"></iframe>
+<!-- <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=6d6d9455-7174-447a-8bcb-eceaa51a4af5&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="5. Bellman v.mkv"></iframe>
+
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=3a18cbb0-6960-42c1-bcf4-8e0893c09c89&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200"frameborder="0" scrolling="no" allowfullscreen title="6. Bellman q simple.mkv"></iframe> -->
 
 ### Bellman Optimality Equations
 
@@ -480,10 +514,20 @@ Q_*(s, a) = \sum_{s', r} p(s', r \mid s, a) \left[ r + \gamma \max_{a'} Q_*(s', 
 
 - The **max** operator ensures that the agent chooses the action \( a \) that maximizes the expected return.
 
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/7. Bellman Optimality 1.mp4" type="video/mp4">
+  Bellman Optimality 1
+</video>
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=b73eab99-7af2-4b9e-8909-19492615d273&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. Bellman Optimality 1.mkv"></iframe>
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/7. Bellman Optimality 2.mp4" type="video/mp4">
+  Bellman Optimality 2
+</video>
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=8d89893b-6e99-4380-a31e-93e2974cd04a&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. Bellman Optimality 2.mkv"></iframe>
+<!-- <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=b73eab99-7af2-4b9e-8909-19492615d273&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. Bellman Optimality 1.mkv"></iframe>
+
+<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=8d89893b-6e99-4380-a31e-93e2974cd04a&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. Bellman Optimality 2.mkv"></iframe> -->
+
 
 You can adjust the video settings in SharePoint (speed up to 1.2 and reduce the noise if necessary)
 
@@ -494,7 +538,12 @@ You can adjust the video settings in SharePoint (speed up to 1.2 and reduce the 
 
  Bellman Optimality for q from first principles can be found in this *optional video*.
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=fef86f50-e352-4af5-a85b-7f134be29085&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. MDP Bellman Equation for q from first prinsiple.mkv"></iframe>
+<!-- <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=fef86f50-e352-4af5-a85b-7f134be29085&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. MDP Bellman Equation for q from first prinsiple.mkv"></iframe> -->
+
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/7. MDP Bellman Equation for q from first principle.mp4" type="video/mp4">
+  MDP Bellman Equation for q from first principle
+</video>
 
 
 ## Grid World Environments

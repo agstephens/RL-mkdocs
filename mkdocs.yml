@@ -99,3 +99,7 @@ extra_javascript:
 
 extra_css:
   - css/extra.css
+
+extra:
+  mime_types:
+    mp4: video/mp4
