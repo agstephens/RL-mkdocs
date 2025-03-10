@@ -72,7 +72,7 @@ Okay, so we are ready now to move to Dynamic Programming algorithms to solve the
 </video>  
 
 <video width="470" height="200" controls>  
-  <source src="../../videos/8. Dynamic Programming 2.mp4" type="video/mp4">  
+  <source src="/RL-mkdocs/videos/8. Dynamic Programming 2.mp4" type="video/mp4">  
   Dynamic Programming 2  
 </video>  
  
@@ -82,7 +82,7 @@ The first step to improving any policy is to evaluate how good or bad the policy
 We can devise an evaluation strategy based on the discounted sum of rewards the agent is *expected* to collect while executing the task. The strategy depends on the dynamics of the environment. You may want to read section 4.1 and come back here to continue reading the code for the policy evaluation algorithm to get an insight into how it works.
 
 <video width="470" height="200" controls>  
-  <source src="/videos/9. policy evaluation.mp4" type="video/mp4">  
+  <source src="/RL-mkdocs/videos/9. policy evaluation.mp4" type="video/mp4">  
   Policy Evaluation  
 </video>  
 

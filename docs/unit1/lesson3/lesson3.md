@@ -123,11 +123,11 @@ p(s' | s, a) = p(s' | s, a) \quad \forall t
 \]
 
 <video width="470" height="200" controls>
-  <source src="/videos/1. MDP.mp4" type="video/mp4">
+  <source src="/RL-mkdocs/videos/1. MDP.mp4" type="video/mp4">
 </video>
 
 <video width="470" height="200" controls>
-  <source src="/videos/2. Dynamics.mp4" type="video/mp4">
+  <source src="/RL-mkdocs/videos/2. Dynamics.mp4" type="video/mp4">
 </video>
 
 
@@ -226,12 +226,12 @@ Hence by multiplying $G_{t+1}$ by $\gamma$ and adding R_{t+1} we get
 In the video below we talk more about this important concept.
 
 <video width="470" height="200" controls>
-  <source src="/videos/3. Returns 1.mp4" type="video/mp4">
+  <source src="/RL-mkdocs/videos/3. Returns 1.mp4" type="video/mp4">
   Returns 1
 </video>
 
 <video width="470" height="200" controls>
-  <source src="/videos/3. Returns 2.mp4" type="video/mp4">
+  <source src="/RL-mkdocs/videos/3. Returns 2.mp4" type="video/mp4">
   Return 2
 </video>
 
@@ -429,7 +429,7 @@ In the following video we tackle this idea in more details.
 <!-- <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=7b8178ed-68d1-4335-8ab7-3d81f214f362&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="475" height="200"frameborder="0" scrolling="no" allowfullscreen title="4. Returns Expectation and Sampling.mkv"></iframe> -->
 
 <video width="470" height="200" controls>
-  <source src="/videos/4. Returns Expectation and Sampling.mp4" type="video/mp4">
+  <source src="/RL-mkdocs/videos/4. Returns Expectation and Sampling.mp4" type="video/mp4">
   Returns Expectation and Sampling
 </video>
 
@@ -477,12 +477,12 @@ Where:
 - The terms \( r(s, a, s') \), \( \gamma \), and \( p(s' | s, a) \) are the same as in the value function equation.
 
 <video width="470" height="200" controls>
-  <source src="/videos/5. Bellman v.mp4" type="video/mp4">
+  <source src="/RL-mkdocs/videos/5. Bellman v.mp4" type="video/mp4">
   Bellman v
 </video>
 
 <video width="470" height="200" controls>
-  <source src="/videos/6. Bellman q simple.mp4" type="video/mp4">
+  <source src="/RL-mkdocs/videos/6. Bellman q simple.mp4" type="video/mp4">
   Bellman q simple
 </video>
 
@@ -515,12 +515,12 @@ Q_*(s, a) = \sum_{s', r} p(s', r \mid s, a) \left[ r + \gamma \max_{a'} Q_*(s', 
 - The **max** operator ensures that the agent chooses the action \( a \) that maximizes the expected return.
 
 <video width="470" height="200" controls>
-  <source src="/videos/7. Bellman Optimality 1.mp4" type="video/mp4">
+  <source src="/RL-mkdocs/videos/7. Bellman Optimality 1.mp4" type="video/mp4">
   Bellman Optimality 1
 </video>
 
 <video width="470" height="200" controls>
-  <source src="/videos/7. Bellman Optimality 2.mp4" type="video/mp4">
+  <source src="/RL-mkdocs/videos/7. Bellman Optimality 2.mp4" type="video/mp4">
   Bellman Optimality 2
 </video>
 
@@ -538,7 +538,12 @@ You can adjust the video settings in SharePoint (speed up to 1.2 and reduce the 
 
  Bellman Optimality for q from first principles can be found in this *optional video*.
 
-<iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=fef86f50-e352-4af5-a85b-7f134be29085&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. MDP Bellman Equation for q from first prinsiple.mkv"></iframe>
+<!-- <iframe src="https://leeds365-my.sharepoint.com/personal/scsaalt_leeds_ac_uk/_layouts/15/embed.aspx?UniqueId=fef86f50-e352-4af5-a85b-7f134be29085&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="470" height="200" frameborder="0" scrolling="no" allowfullscreen title="7. MDP Bellman Equation for q from first prinsiple.mkv"></iframe> -->
+
+<video width="470" height="200" controls>
+  <source src="/RL-mkdocs/videos/7. MDP Bellman Equation for q from first principle.mp4" type="video/mp4">
+  MDP Bellman Equation for q from first principle
+</video>
 
 
 ## Grid World Environments
